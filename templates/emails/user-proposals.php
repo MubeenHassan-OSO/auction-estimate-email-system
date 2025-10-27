@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Modern Email Template for User Proposals
  * Sent when admin creates proposals for a user's auction estimate request
@@ -8,16 +9,12 @@ $site_name = get_bloginfo('name');
 $site_url = home_url('/');
 
 // Get logo URL
-$custom_logo_id = get_theme_mod('custom_logo');
-$logo_url = $custom_logo_id ? wp_get_attachment_image_url($custom_logo_id, 'full') : '';
+$logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
 
-// Fallback to site icon if no custom logo
-if (empty($logo_url) && has_site_icon()) {
-    $logo_url = get_site_icon_url(200);
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,7 +46,7 @@ if (empty($logo_url) && has_site_icon()) {
         }
 
         .email-container {
-            max-width: 640px;
+            max-width: 768px;
             margin: 0 auto;
             background: #FFFFFF;
             border-radius: 16px;
@@ -60,14 +57,15 @@ if (empty($logo_url) && has_site_icon()) {
         /* Header Section */
         .email-header {
             background: #667EEA;
-            padding: 48px 32px;
+            padding: 30px 20px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
         }
 
         .header-logo {
             max-width: 180px;
             max-height: 80px;
-            margin-bottom: 24px;
             display: block;
             margin-left: auto;
             margin-right: auto;
@@ -77,7 +75,6 @@ if (empty($logo_url) && has_site_icon()) {
             color: #FFFFFF;
             font-size: 28px;
             font-weight: 700;
-            margin: 0 0 12px 0;
             letter-spacing: -0.5px;
         }
 
@@ -90,20 +87,22 @@ if (empty($logo_url) && has_site_icon()) {
 
         /* Body Section */
         .email-body {
-            padding: 48px 32px;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
         .greeting {
             font-size: 20px;
             font-weight: 600;
             color: #111827;
-            margin: 0 0 16px 0;
         }
 
         .intro-text {
             font-size: 16px;
             color: #6B7280;
-            margin: 0 0 40px 0;
+            margin: 0 0 20px 0;
             line-height: 1.7;
         }
 
@@ -111,23 +110,26 @@ if (empty($logo_url) && has_site_icon()) {
             font-size: 18px;
             font-weight: 700;
             color: #374151;
-            margin: 0 0 24px 0;
+            margin: 0 0 15px 0;
             padding-bottom: 12px;
             border-bottom: 2px solid #E5E7EB;
         }
 
         /* Proposal Cards */
         .proposals-wrapper {
-            margin-bottom: 32px;
+            margin-bottom: 15px;
         }
 
         .proposal-card {
-            background: #FFFFFF;
-            border: 2px solid #E5E7EB;
+            background: #fffcf56e;
+            border: 1px solid #E5E7EB;
             border-radius: 12px;
-            padding: 32px;
+            padding: 20px;
             margin-bottom: 24px;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
 
         .proposal-card:hover {
@@ -142,14 +144,12 @@ if (empty($logo_url) && has_site_icon()) {
         .proposal-header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
             border-bottom: 1px solid #F3F4F6;
         }
 
         .proposal-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
             border-radius: 12px;
             display: flex;
@@ -166,7 +166,7 @@ if (empty($logo_url) && has_site_icon()) {
         }
 
         .proposal-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             color: #111827;
             margin: 0;
@@ -175,12 +175,14 @@ if (empty($logo_url) && has_site_icon()) {
 
         .price-section {
             background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
-            border-radius: 10px;
-            padding: 20px 24px;
-            margin-bottom: 20px;
+            border-radius: 0 0 8px 8px;
+            padding: 10px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-width: 0 1px 1px 1px;
+            border-style: solid;
+            border-color: #d4d4d4;
         }
 
         .price-label {
@@ -192,18 +194,20 @@ if (empty($logo_url) && has_site_icon()) {
         }
 
         .price-value {
-            font-size: 32px;
+            font-size: 24px;
             font-weight: 700;
             color: #1E3A8A;
             letter-spacing: -1px;
         }
 
         .details-section {
-            background: #F9FAFB;
-            border-left: 4px solid #667EEA;
-            border-radius: 8px;
-            padding: 20px 24px;
-            margin-bottom: 24px;
+            padding: 15px 20px;
+            font-size: 18px;
+            margin-bottom: -25px;
+            border-radius: 8px 8px 0 0;
+            border-width: 1px 1px 0 1px;
+            border-style: solid;
+            border-color: #d4d4d4;
         }
 
         .details-section p {
@@ -217,14 +221,14 @@ if (empty($logo_url) && has_site_icon()) {
         .button-group {
             display: flex;
             gap: 12px;
-            margin-top: 24px;
+            justify-content: right;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 32px;
+            padding: 8px 20px;
             border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
@@ -232,6 +236,7 @@ if (empty($logo_url) && has_site_icon()) {
             transition: all 0.3s ease;
             flex: 1;
             text-align: center;
+            max-width: 200px;
         }
 
         .btn-accept {
@@ -260,27 +265,8 @@ if (empty($logo_url) && has_site_icon()) {
         /* Footer Section */
         .email-footer {
             background: #F9FAFB;
-            padding: 40px 32px;
+            padding: 20px;
             border-top: 1px solid #E5E7EB;
-        }
-
-        .footer-help {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .footer-help-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #111827;
-            margin: 0 0 12px 0;
-        }
-
-        .footer-help-text {
-            font-size: 15px;
-            color: #6B7280;
-            margin: 0 0 16px 0;
-            line-height: 1.6;
         }
 
         .footer-contact {
@@ -291,12 +277,6 @@ if (empty($logo_url) && has_site_icon()) {
             text-decoration: none;
             font-weight: 600;
             font-size: 15px;
-        }
-
-        .footer-divider {
-            height: 1px;
-            background: #E5E7EB;
-            margin: 32px 0;
         }
 
         .footer-info {
@@ -313,26 +293,8 @@ if (empty($logo_url) && has_site_icon()) {
         .footer-copyright {
             font-size: 14px;
             color: #9CA3AF;
-            margin: 0 0 16px 0;
         }
 
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .footer-link {
-            font-size: 14px;
-            color: #6B7280;
-            text-decoration: none;
-        }
-
-        .footer-link:hover {
-            color: #667EEA;
-            text-decoration: underline;
-        }
 
         /* Responsive */
         @media only screen and (max-width: 640px) {
@@ -393,6 +355,7 @@ if (empty($logo_url) && has_site_icon()) {
         }
     </style>
 </head>
+
 <body>
     <div class="email-wrapper">
         <div class="email-container">
@@ -422,13 +385,22 @@ if (empty($logo_url) && has_site_icon()) {
                             <div class="proposal-header">
                                 <div class="proposal-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zm10 16H4V9h16v11z"/>
+                                        <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zm10 16H4V9h16v11z" />
                                     </svg>
                                 </div>
                                 <h3 class="proposal-title">
                                     <?php echo esc_html($proposal['title'] ?? 'Proposal #' . ($index + 1)); ?>
                                 </h3>
                             </div>
+
+
+                            <!-- Details -->
+                            <?php if (!empty($proposal['details'])): ?>
+                                <div class="details-section">
+                                    <?php echo wp_kses_post($proposal['details']); ?>
+                                </div>
+                            <?php endif; ?>
+
 
                             <!-- Price -->
                             <?php if (!empty($proposal['price'])): ?>
@@ -438,12 +410,7 @@ if (empty($logo_url) && has_site_icon()) {
                                 </div>
                             <?php endif; ?>
 
-                            <!-- Details -->
-                            <?php if (!empty($proposal['details'])): ?>
-                                <div class="details-section">
-                                    <?php echo wp_kses_post($proposal['details']); ?>
-                                </div>
-                            <?php endif; ?>
+
 
                             <!-- Action Buttons -->
                             <?php
@@ -472,24 +439,10 @@ if (empty($logo_url) && has_site_icon()) {
 
             <!-- Footer -->
             <div class="email-footer">
-                <div class="footer-help">
-                    <h3 class="footer-help-title">Need Help?</h3>
-                    <p class="footer-help-text">
-                        Have questions about these proposals? Our team is here to help you make the right decision.
-                    </p>
-                    <a href="mailto:<?php echo esc_attr(get_option('admin_email')); ?>" class="footer-contact">
-                        📧 Contact Support
-                    </a>
-                </div>
-
-                <div class="footer-divider"></div>
 
                 <div class="footer-info">
                     <p class="footer-brand"><?php echo esc_html($site_name); ?></p>
                     <p class="footer-copyright">&copy; <?php echo date('Y'); ?> All rights reserved.</p>
-                    <div class="footer-links">
-                        <a href="<?php echo esc_url($site_url); ?>" class="footer-link">Visit Website</a>
-                    </div>
                 </div>
             </div>
 
