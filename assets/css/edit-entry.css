@@ -1,0 +1,1230 @@
+/* Container & Layout */
+.aees-edit-entry-container {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Header Section */
+.aees-header {
+    padding: 16px 24px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E5E7EB;
+    margin-bottom: 20px;
+}
+
+.aees-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.aees-header-left {
+    flex: 1;
+}
+
+.aees-title {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1F2937;
+    letter-spacing: -0.3px;
+}
+
+.aees-meta {
+    font-size: 14px;
+    color: #6B7280;
+    margin-bottom: 8px;
+}
+
+.aees-status-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.aees-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.aees-badge-success {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.aees-badge-warning {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.aees-badge-info {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.aees-header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.aees-header .button {
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.aees-header .button-primary {
+    background: #2271b1 !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.aees-header .button-primary:hover {
+    background: #135e96 !important;
+    color: #FFFFFF !important;
+}
+
+/* Response Status Boxes */
+.aees-response-status-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.aees-response-box {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.aees-response-box-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.aees-response-box-content {
+    font-size: 14px;
+    color: #374151;
+}
+
+.aees-response-box.has-response {
+    border-left: 4px solid #10B981;
+    background: #F0FDF4;
+}
+
+.aees-response-box.pending {
+    border-left: 4px solid #D1D5DB;
+    background: #F9FAFB;
+}
+
+/* Collapsible Form Data */
+.aees-collapsible {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.aees-collapsible-header {
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease;
+}
+
+.aees-collapsible-header:hover {
+    background: #F9FAFB;
+}
+
+.aees-collapsible-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.aees-collapsible-subtitle {
+    font-size: 13px;
+    color: #9CA3AF;
+    margin-top: 2px;
+}
+
+.aees-collapsible-icon {
+    font-size: 24px;
+    font-weight: 700;
+    color: #2271b1;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #EFF6FF;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.aees-collapsible-content {
+    display: none;
+    padding: 0 20px 20px 20px;
+    border-top: 1px solid #E5E7EB;
+}
+
+.aees-collapsible-content.open {
+    display: block;
+}
+
+/* Section Cards */
+.aees-section {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid #E5E7EB;
+}
+
+.aees-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1F2937;
+    margin: 0 0 20px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #2271b1;
+    letter-spacing: -0.3px;
+}
+
+.aees-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #2271b1;
+}
+
+.aees-section-header h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* Email Status Inline */
+.aees-email-status-inline {
+    font-size: 13px;
+    color: #6B7280;
+    padding: 8px 12px;
+    background: #F3F4F6;
+    border-radius: 6px;
+    margin: 16px 0;
+}
+
+/* Submission Info - Hidden by default in collapsible */
+.aees-submission-info {
+    background-color: #F9FAFB;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
+
+.aees-submission-info p {
+    margin: 6px 0;
+    color: #4B5563;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.aees-submission-info strong {
+    color: #1F2937;
+    font-weight: 600;
+}
+
+/* Field Groups - New Card Design */
+.aees-field-group-section {
+    margin-bottom: 20px;
+}
+
+.aees-form-section {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #E5E7EB;
+    margin-bottom: 16px;
+}
+
+.aees-section-header-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #2271b1;
+}
+
+.aees-section-icon {
+    width: 32px;
+    height: 32px;
+    background: #EFF6FF;
+    color: #2271b1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.aees-group-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1F2937;
+    margin: 0;
+}
+
+/* Field Grid Layout */
+.aees-field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.aees-field-item {
+    padding: 10px 12px;
+    background: #F9FAFB;
+    border-radius: 6px;
+    border-left: 3px solid #E5E7EB;
+}
+
+.aees-field-item-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.aees-field-item-value {
+    font-size: 14px;
+    color: #1F2937;
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.aees-field-item-value em {
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+/* Full width field items for long text */
+.aees-field-item-full {
+    grid-column: 1 / -1;
+}
+
+/* Data Tables */
+.aees-data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 24px;
+    background: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+}
+
+.aees-data-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.aees-data-table tbody tr:nth-child(even) {
+    background: #F9FAFB;
+}
+
+.aees-data-table tbody tr:hover {
+    background: #EFF6FF;
+}
+
+.aees-data-table td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #E5E7EB;
+    font-size: 14px;
+}
+
+.aees-data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aees-field-label {
+    width: 200px;
+    color: #6B7280;
+    font-weight: 600;
+    vertical-align: top;
+}
+
+.aees-field-value {
+    color: #1F2937;
+    line-height: 1.6;
+}
+
+.aees-field-value em {
+    color: #9CA3AF;
+    font-style: italic;
+}
+
+/* File Links */
+.aees-file-link {
+    display: inline-block;
+    padding: 8px 14px;
+    background: #EFF6FF;
+    color: #2271b1;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 4px;
+    transition: all 0.2s ease;
+    border: 1px solid #DBEAFE;
+}
+
+.aees-file-link:hover {
+    background: #DBEAFE;
+    color: #135e96;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(34, 113, 177, 0.15);
+}
+
+/* Repeater Tables - Compact Design */
+.aees-repeater-table-wrapper {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+
+.aees-repeater-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.aees-repeater-table thead {
+    background: #F3F4F6;
+}
+
+.aees-repeater-table thead th {
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid #E5E7EB;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.aees-repeater-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #E5E7EB;
+    color: #1F2937;
+    font-size: 13px;
+}
+
+.aees-repeater-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.aees-row-number {
+    background-color: #F9FAFB;
+    font-weight: 600;
+    color: #6B7280;
+    text-align: center;
+    width: 50px;
+}
+
+/* Repeater Rows (Ship To style) */
+.aees-repeater-row {
+    margin-bottom: 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #FFFFFF;
+}
+
+.aees-repeater-row-number {
+    display: none;
+    background-color: #2271b1;
+    color: #FFFFFF;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+}
+
+.aees-repeater-row .aees-data-table {
+    border: none;
+    margin: 0;
+}
+
+/* Proposals Section */
+.aees-proposals {
+    background-color: #F9FAFB;
+}
+
+/* Field Group (Form Inputs) */
+.aees-field-group {
+    margin-bottom: 16px;
+}
+
+.aees-field-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.aees-field-group input[type="text"],
+.aees-field-group input[type="email"],
+.aees-field-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+    background: #FFFFFF;
+    color: #1F2937;
+}
+
+.aees-field-group input[type="text"]:focus,
+.aees-field-group input[type="email"]:focus,
+.aees-field-group textarea:focus {
+    outline: none;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.1);
+}
+
+.aees-field-group input[readonly],
+.aees-field-group textarea[readonly] {
+    background: #F3F4F6;
+    color: #6B7280;
+    cursor: not-allowed;
+}
+
+/* Price Input with Dollar Symbol */
+.aees-price-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.aees-price-prefix {
+    position: absolute;
+    left: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #10B981;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.aees-price-input {
+    padding-left: 32px !important;
+    font-weight: 600;
+    color: #10B981 !important;
+}
+
+.aees-price-input:focus {
+    border-color: #10B981 !important;
+    box-shadow: 0 0 0 1px #10B981 !important;
+}
+
+.aees-price-input[readonly] {
+    color: #6B7280 !important;
+}
+
+.aees-price-input[readonly] + .aees-price-prefix {
+    color: #6B7280;
+}
+
+.aees-field-group.full {
+    grid-column: 1 / -1;
+}
+
+/* Proposal Cards */
+#aees-proposals-wrap {
+    display: grid;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.aees-proposal-card {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.aees-proposal-card.locked {
+    border-color: #D1D5DB;
+    background: #FFFFFF;
+}
+
+/* Editing state - keep it simple and clean */
+.aees-proposal-card[data-locked="false"] {
+    border-color: #2271b1;
+    border-width: 1px;
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(34, 113, 177, 0.08);
+}
+
+.aees-proposal-header {
+    background-color: #2271b1;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.aees-proposal-header h3 {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+}
+
+.aees-proposal-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.aees-proposal-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Buttons */
+.button {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    text-align: center;
+}
+
+.button-primary {
+    background-color: #2271b1;
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(34, 113, 177, 0.3);
+}
+
+.button-primary:hover {
+    background-color: #135e96;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(34, 113, 177, 0.4);
+}
+
+.button-primary:disabled {
+    background: #D1D5DB;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.button-link-delete {
+    background: transparent;
+    color: #EF4444;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.button-link-delete:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #EF4444;
+}
+
+.aees-edit-proposal {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.aees-edit-proposal:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+#aees-add-proposal {
+    font-size: 15px;
+    border-radius: 8px;
+    height: 38px;
+}
+
+/* Footer Actions */
+.aees-footer {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.aees-footer button {
+    height: 40px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+}
+
+.aees-save-btn {
+    font-size: 16px;
+}
+
+#aees-send-email {
+    background: #10B981;
+    color: #FFFFFF;
+    border: none;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+#aees-send-email:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+#aees-send-email:disabled {
+    background: #D1D5DB;
+    color: #9CA3AF;
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+#aees-send-email:disabled:hover {
+    background: #D1D5DB;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Email Sent Notice - Blue Theme */
+.aees-email-sent-notice {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    border-left: 6px solid #3B82F6;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 0 0 24px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.aees-email-sent-icon {
+    font-size: 42px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.aees-email-sent-content {
+    flex: 1;
+}
+
+.aees-email-sent-content h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1E40AF;
+    letter-spacing: -0.3px;
+}
+
+.aees-email-sent-content p {
+    margin: 0;
+    color: #1E3A8A;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.aees-email-sent-content strong {
+    color: #1E40AF;
+    font-weight: 600;
+}
+
+/* User Response Notice - Clean & Professional */
+.aees-response-notice {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #6B7280;
+}
+
+.aees-response-notice.rejected {
+    border-left-color: #DC2626;
+    background: #FEFEFE;
+}
+
+.aees-response-notice.accepted {
+    border-left-color: #10B981;
+    background: #FEFEFE;
+}
+
+.aees-response-notice.completed {
+    border-left-color: #2563EB;
+    background: #FEFEFE;
+}
+
+.aees-response-notice-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: #F3F4F6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.aees-response-notice.rejected .aees-response-notice-icon {
+    background: #FEF2F2;
+    color: #DC2626;
+}
+
+.aees-response-notice.accepted .aees-response-notice-icon {
+    background: #ECFDF5;
+    color: #10B981;
+}
+
+.aees-response-notice.completed .aees-response-notice-icon {
+    background: #EFF6FF;
+    color: #2563EB;
+}
+
+.aees-response-notice-content {
+    flex: 1;
+}
+
+.aees-response-notice-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1F2937;
+}
+
+.aees-response-notice-content p {
+    margin: 0;
+    color: #6B7280;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.aees-response-notice-content strong {
+    color: #374151;
+    font-weight: 600;
+}
+
+/* Response Grid */
+.aees-response-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.aees-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 28px;
+    border: 2px solid #E5E7EB;
+    transition: all 0.3s ease;
+}
+
+.aees-card:hover {
+    border-color: #2271b1;
+    box-shadow: 0 6px 20px rgba(34, 113, 177, 0.1);
+    transform: translateY(-2px);
+}
+
+.aees-card h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1F2937;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #E5E7EB;
+}
+
+/* WYSIWYG Wrapper */
+.aees-wysiwyg-wrapper {
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.aees-wysiwyg-wrapper:focus-within {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.1);
+}
+
+.aees-wysiwyg-wrapper .wp-editor-container {
+    border: none;
+}
+
+.aees-wysiwyg-wrapper textarea {
+    border: none;
+    border-radius: 0;
+}
+
+/* TinyMCE Editor Styles */
+.mce-tinymce {
+    border-radius: 8px !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .aees-header {
+        padding: 24px;
+    }
+
+    .aees-title {
+        font-size: 24px;
+    }
+
+    .aees-section {
+        padding: 24px;
+    }
+
+    .aees-proposal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .aees-footer {
+        flex-direction: column;
+    }
+
+    .aees-footer .button {
+        width: 100%;
+    }
+
+    .aees-field-label {
+        width: auto;
+        display: block;
+        padding-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .aees-edit-entry-container {
+        padding: 0 10px;
+        margin: 20px auto;
+    }
+
+    .aees-header {
+        padding: 20px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .aees-title {
+        font-size: 20px;
+    }
+
+    .aees-proposal-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .aees-proposal-actions {
+        width: 100%;
+    }
+
+    .aees-proposal-actions .button {
+        flex: 1;
+    }
+}
+
+/* Spinning animation for refresh button */
+@keyframes aees-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.aees-spin {
+    animation: aees-spin 1s linear infinite;
+    display: inline-block;
+}
+
+/* Refresh cache button styling */
+#aees-refresh-cache .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+#aees-refresh-cache:hover .dashicons {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+/* Entry Status Badge - Danger Style */
+.aees-badge-danger {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* Rejection History Section (Now Collapsible) */
+.aees-rejection-history-collapsible {
+    margin-bottom: 24px;
+}
+
+.aees-rejection-history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.aees-rejection-history-item {
+    background: #F9FAFB;
+    border: 1px solid #E5E7EB;
+    border-radius: 6px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.aees-rejection-history-item:hover {
+    border-color: #D1D5DB;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.aees-rejection-history-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.aees-rejection-number {
+    background: #1F2937;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    min-width: 28px;
+    text-align: center;
+}
+
+.aees-rejection-status {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.aees-rejection-status.status-rejected {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.aees-rejection-status.status-invalid {
+    background: #F3F4F6;
+    color: #6B7280;
+}
+
+.aees-rejection-date {
+    font-size: 12px;
+    color: #6B7280;
+    margin-left: auto;
+}
+
+.aees-rejection-history-item-body {
+    display: grid;
+    gap: 10px;
+}
+
+.aees-rejection-field {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.aees-rejection-field strong {
+    color: #374151;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 50px;
+}
+
+.aees-rejection-details {
+    margin-top: 6px;
+}
+
+.aees-rejection-details-content {
+    margin-top: 6px;
+    padding: 12px;
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+/* Responsive adjustments for rejection history */
+@media (max-width: 768px) {
+    .aees-rejection-history-item-header {
+        flex-wrap: wrap;
+    }
+
+    .aees-rejection-date {
+        flex-basis: 100%;
+        margin-left: 0;
+        margin-top: 4px;
+    }
+}
+
+/* Entry Closed Notice */
+.aees-entry-closed-notice {
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+    border: 2px solid #FECACA;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+}
+
+/* Authorized State (Green/Success Theme) */
+.aees-entry-closed-notice.aees-entry-authorized {
+    background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+    border: 2px solid #A7F3D0;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+.aees-entry-closed-icon {
+    font-size: 36px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.aees-entry-closed-content {
+    flex: 1;
+}
+
+.aees-entry-closed-content h3 {
+    margin: 0 0 8px 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #991B1B;
+    letter-spacing: -0.2px;
+}
+
+/* Authorized state heading */
+.aees-entry-authorized .aees-entry-closed-content h3 {
+    color: #065F46;
+}
+
+.aees-entry-closed-content p {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #B91C1C;
+    line-height: 1.6;
+}
+
+/* Authorized state text */
+.aees-entry-authorized .aees-entry-closed-content p {
+    color: #047857;
+}
+
+.aees-entry-closed-content p:last-child {
+    margin-bottom: 0;
+}
+
+.aees-entry-closed-action {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(185, 28, 28, 0.2);
+}
+
+/* Authorized state action section */
+.aees-entry-authorized .aees-entry-closed-action {
+    border-top: 1px solid rgba(6, 95, 70, 0.2);
+}
+
+.aees-entry-closed-action strong {
+    color: #7F1D1D;
+    font-weight: 700;
+}
+
+/* Authorized state strong text */
+.aees-entry-authorized .aees-entry-closed-action strong {
+    color: #064E3B;
+}
+
+/* Responsive adjustments for closed notice */
+@media (max-width: 768px) {
+    .aees-entry-closed-notice {
+        padding: 16px 20px;
+    }
+
+    .aees-entry-closed-icon {
+        font-size: 28px;
+    }
+
+    .aees-entry-closed-content h3 {
+        font-size: 16px;
+    }
+
+    .aees-entry-closed-content p {
+        font-size: 13px;
+    }
+}

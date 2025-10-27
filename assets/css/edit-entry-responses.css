@@ -1,0 +1,154 @@
+/* ====================================
+   AEES Response Status - Modern Design
+   ==================================== */
+
+/* User Response Status Styles */
+.aees-response-status {
+    display: flex;
+    align-items: center;
+    padding: 24px;
+    border-radius: 12px;
+    margin-top: 16px;
+    transition: all 0.3s ease;
+}
+
+.aees-response-status.aees-status-rejected {
+    background-color: #FEF2F2;
+    border-left: 5px solid #EF4444;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+}
+
+.aees-response-status.aees-status-accepted {
+    background-color: #F0FDF4;
+    border-left: 5px solid #10B981;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+.aees-status-icon {
+    font-size: 48px;
+    margin-right: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.aees-status-rejected .aees-status-icon {
+    color: #EF4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.aees-status-accepted .aees-status-icon {
+    color: #10B981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.aees-status-details {
+    flex: 1;
+}
+
+.aees-status-details p {
+    margin: 10px 0;
+    color: #374151;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.aees-status-details p:first-child {
+    margin-top: 0;
+}
+
+.aees-status-details p:last-child {
+    margin-bottom: 0;
+}
+
+.aees-status-details strong {
+    color: #1F2937;
+    font-weight: 600;
+}
+
+.aees-status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.aees-status-rejected .aees-status-badge {
+    background-color: #EF4444;
+    color: #FFFFFF;
+}
+
+.aees-status-accepted .aees-status-badge {
+    background-color: #10B981;
+    color: #FFFFFF;
+}
+
+/* Read-only mode */
+.aees-entry-readonly .aees-proposal-card {
+    opacity: 0.75;
+    pointer-events: none;
+    filter: grayscale(20%);
+}
+
+.aees-entry-readonly #aees-add-proposal,
+.aees-entry-readonly #aees-save-entry {
+    display: none !important;
+}
+
+.aees-entry-readonly .aees-edit-proposal,
+.aees-entry-readonly .aees-remove-proposal {
+    display: none !important;
+}
+
+.aees-readonly-notice {
+    background-color: #FFF3CD;
+    border-left: 5px solid #FFC107;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    color: #856404;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.aees-readonly-notice::before {
+    content: "⚠️";
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .aees-response-status {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .aees-status-icon {
+        margin-right: 0;
+        margin-bottom: 16px;
+    }
+
+    .aees-readonly-notice {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .aees-readonly-notice::before {
+        margin-bottom: 8px;
+    }
+}
