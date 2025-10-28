@@ -81,40 +81,41 @@ delete_transient('aees_response_status');
 
     .aees-response-header {
         background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-        padding: 40px 30px;
+        padding: 30px 30px;
         text-align: center;
     }
 
     .aees-response-logo {
         max-width: 180px;
         max-height: 70px;
-        margin-bottom: 20px;
-        filter: brightness(0) invert(1);
+        margin-bottom: 10px;
     }
 
     .aees-response-header h1 {
         color: #FFFFFF;
-        font-size: 20px;
-        font-weight: 600;
+        font-size: 28px;
+        font-weight: 700;
         letter-spacing: 0.5px;
-        opacity: 0.95;
+        margin: 0;
     }
 
     .aees-response-content {
-        padding: 50px 40px;
+       padding: 40px 30px;
+       text-align: center;
     }
 
     .aees-response-icon {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
         border-radius: 50%;
-        margin: 0 auto 28px;
+        margin: 0 auto 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 40px;
-        animation: scaleIn 0.5s ease-out 0.3s both;
-    }
+        font-size: 35px;
+        animation: scaleIn 0.5s 
+        ease-out 0.3s both;
+}
 
     @keyframes scaleIn {
         from {
@@ -147,7 +148,7 @@ delete_transient('aees_response_status');
         font-size: 28px;
         font-weight: 700;
         color: #1F2937;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         text-align: center;
         letter-spacing: -0.5px;
     }
@@ -156,11 +157,11 @@ delete_transient('aees_response_status');
         font-size: 16px;
         color: #4B5563;
         line-height: 1.8;
-        margin-bottom: 32px;
+        margin-bottom: 0;
     }
 
     .aees-response-message p {
-        margin-bottom: 16px;
+        margin-bottom: 0;
     }
 
     .aees-response-message p:last-child {
@@ -205,9 +206,9 @@ delete_transient('aees_response_status');
 
     .aees-response-button {
         display: inline-block;
-        width: 100%;
+        width: fit-content;
         padding: 18px 40px;
-        background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+        background: #db0f31;
         color: #FFFFFF;
         text-decoration: none;
         border-radius: 12px;
@@ -220,7 +221,7 @@ delete_transient('aees_response_status');
     }
 
     .aees-response-button:hover {
-        background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        background: #db0f31;
         color: #FFFFFF;
         transform: translateY(-2px);
         box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
@@ -228,15 +229,15 @@ delete_transient('aees_response_status');
 
     .aees-response-footer {
         background: #F9FAFB;
-        padding: 30px 40px;
+        padding: 20px;
         text-align: center;
         border-top: 1px solid #E5E7EB;
     }
 
     .aees-response-footer p {
         color: #6B7280;
-        font-size: 14px;
-        margin: 8px 0;
+        font-size: 16px;
+        margin: 0;
     }
 
     .aees-response-footer strong {
