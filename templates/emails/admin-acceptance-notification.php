@@ -21,6 +21,96 @@ $user_email = $form_data['user_email'] ?? 'Not available';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proposal Accepted - Authorization Pending</title>
+    <style>
+         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F9FAFB;
+            color: #111827;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .confirmation-header{
+            background-color: #10b981; 
+            padding: 30px 30px; 
+            text-align: center;
+        }
+        .confirmation-heading{
+            margin: 0; 
+            color: #FFFFFF; 
+            font-size: 30px; 
+            font-weight: 700; 
+            letter-spacing: -0.5px;
+        }
+        .confirmation-details{
+            margin: 0; 
+            color: rgba(255, 255, 255, 0.95); 
+            font-size: 16px; 
+            font-weight: 400;
+        }
+        .body-content{
+            padding: 30px;
+        }
+        .response-alert{
+            background: #d1fae55c;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #92ffc7;
+        }
+        .response-entry-details{
+            background: #00000000;
+            border-radius: 8px;
+            border: 1px solid #d4d4d4;
+            margin-bottom: 20px;
+        }
+        .response-accepted-proposal{
+            background: #00000000;
+            border-radius: 8px;
+            border: 1px solid #d4d4d4;
+            margin-bottom: 20px;
+        }
+        .accepted-proposal-title{
+            display: grid;
+            gap: 45px;
+            grid-template-columns: minmax(70px, 70px) 1fr;
+            margin-bottom: 16px;
+        }
+        .accepted-proposal-price{
+            display: grid;
+            gap: 45px;
+            grid-template-columns: minmax(70px, 70px) 1fr;
+            margin-bottom: 16px;
+        }
+        .accepted-proposal-details{
+            display: grid;
+            gap: 45px;
+            grid-template-columns: minmax(70px, 70px) 1fr;
+            margin-bottom: 16px;
+        }
+        .accepted-proposal-next{
+            margin-top: 20px;
+            background: #EFF6FF;
+            border-radius: 8px;
+            border: 1px solid #3B82F6;
+        }
+        .proposal-details-p{
+            color: #4B5563;
+            font-size: 14px;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .proposal-details-p p{
+            margin: 0;
+        }
+    </style>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #F3F4F6; line-height: 1.6;">
 
@@ -28,15 +118,15 @@ $user_email = $form_data['user_email'] ?? 'Not available';
         <tr>
             <td align="center">
                 <!-- Main Container -->
-                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
 
                     <!-- Header -->
                     <tr>
-                        <td style="background-color: #10b981; padding: 40px 30px; text-align: center;">
-                            <h1 style="margin: 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                                🎉 Proposal Accepted!
+                        <td class="confirmation-header">
+                            <h1 class="confirmation-heading">
+                                Proposal Accepted!
                             </h1>
-                            <p style="margin: 12px 0 0 0; color: rgba(255, 255, 255, 0.95); font-size: 15px; font-weight: 400;">
+                            <p class="confirmation-details">
                                 Awaiting auction house authorization
                             </p>
                         </td>
@@ -44,9 +134,9 @@ $user_email = $form_data['user_email'] ?? 'Not available';
 
                     <!-- Body Content -->
                     <tr>
-                        <td style="padding: 40px 30px;">
+                        <td class="body-content">
                             <!-- Success Alert -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #D1FAE5; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 30px;">
+                            <table width="100%" class="response-alert" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="color: #065F46; font-size: 14px; line-height: 1.6;">
@@ -58,9 +148,9 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Entry Info Card -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F9FAFB; border-radius: 8px; border-left: 4px solid #db0f31; margin-bottom: 30px;">
+                            <table width="100%" class="response-entry-details" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="padding: 24px;">
+                                    <td style="padding: 20px;">
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Entry Details
                                         </h3>
@@ -83,24 +173,24 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Proposal Info Card -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F9FAFB; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 30px;">
+                            <table width="100%" class="response-accepted-proposal" cellpadding="0" cellspacing="0">
                                 <tr>
-                                    <td style="padding: 24px;">
+                                    <td style="padding: 20px;">
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Accepted Proposal
                                         </h3>
-                                        <div style="margin-bottom: 16px;">
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Title</div>
+                                        <div class="accepted-proposal-title">
+                                            <div style="color: #6B7280; font-size: 16px; font-weight: 400;  letter-spacing: 0.5px; ;">Title:</div>
                                             <div style="color: #1F2937; font-size: 16px; font-weight: 600;"><?php echo esc_html($proposal['title']); ?></div>
                                         </div>
-                                        <div style="margin-bottom: 16px;">
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Price</div>
-                                            <div style="color: #10B981; font-size: 24px; font-weight: 700;">$<?php echo esc_html(number_format((float)$proposal['price'], 2)); ?></div>
+                                        <div class="accepted-proposal-price">
+                                            <div style="color: #6B7280; font-size: 16px; font-weight: 400;  letter-spacing: 0.5px;">Price:</div>
+                                            <div style="color: #10B981; font-size: 16px; font-weight: 700;">$<?php echo esc_html(number_format((float)$proposal['price'], 2)); ?></div>
                                         </div>
                                         <?php if (!empty($proposal['details'])): ?>
-                                        <div>
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Details</div>
-                                            <div style="color: #4B5563; font-size: 14px; line-height: 1.6;">
+                                        <div class="accepted-proposal-details">
+                                            <div style="color: #6B7280; font-size: 46px; font-weight: 400;  letter-spacing: 0.5px; ">Details:</div>
+                                            <div class="proposal-details-p">
                                                 <?php
                                                 // Data is already sanitized with wp_kses_post() when saved
                                                 // Use wpautop() to convert line breaks to <p> and <br> tags
@@ -125,14 +215,13 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Workflow Status -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #EFF6FF; border-radius: 8px; margin-top: 30px; border-left: 4px solid #3B82F6;">
+                            <table class="accepted-proposal-next" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="color: #1E40AF; font-size: 14px; line-height: 1.6;">
-                                            <strong style="display: block; margin-bottom: 12px; font-size: 16px;">📋 Next Steps in the Workflow:</strong>
+                                            <strong style="display: block; margin-bottom: 12px; font-size: 18px;">Next Steps:</strong>
                                             <ol style="margin: 0; padding-left: 20px;">
-                                                <li style="margin-bottom: 8px;"><strong>✓ User accepted proposal</strong> (Complete)</li>
-                                                <li style="margin-bottom: 8px;"><strong>⏳ Awaiting auction house authorization</strong> (In Progress)</li>
+                                                <li style="margin-bottom: 8px;">Awaiting auction house authorization (In Progress)</li>
                                                 <li style="margin-bottom: 0;">Final confirmation email will be sent to you once authorized</li>
                                             </ol>
                                         </div>
@@ -147,10 +236,10 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                     <tr>
                         <td style="background: #F9FAFB; padding: 30px; text-align: center; border-top: 1px solid #E5E7EB;">
                             <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
-                                This is an automated notification from <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
+                                <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
                             </p>
                             <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                                &copy; <?php echo date('Y'); ?> <?php echo esc_html($site_name); ?>. All rights reserved.
+                                &copy; <?php echo date('Y'); ?> All rights reserved.
                             </p>
                         </td>
                     </tr>
