@@ -779,63 +779,11 @@ jQuery(document).ready(function ($) {
                             // Update global status for later use
                             aeesData.entry_status = newStatus;
 
-                            // Show/hide closed notice
-                            if (newStatus === 'closed') {
-                                // Show closed notice if it doesn't exist
-                                if ($('#aees-entry-closed-notice').length === 0) {
-                                    const closedNotice = `
-                                        <div class="aees-entry-closed-notice" id="aees-entry-closed-notice">
-                                            <div class="aees-entry-closed-icon">🔒</div>
-                                            <div class="aees-entry-closed-content">
-                                                <h3>Entry Manually Closed</h3>
-                                                <p>This entry was manually closed by an administrator. You cannot create new proposals or send emails while the entry is closed.</p>
-                                                <p class="aees-entry-closed-action"><strong>To continue:</strong> Click the <strong>"Reopen Entry"</strong> button above to allow new proposals.</p>
-                                            </div>
-                                        </div>
-                                    `;
-                                    $('.aees-section-header').after(closedNotice);
-                                } else {
-                                    $('#aees-entry-closed-notice').slideDown(300);
-                                }
-
-                                // Lock all proposal editing
-                                container.find(".aees-edit-proposal, .aees-remove-proposal").prop("disabled", true).css({
-                                    "opacity": "0.5",
-                                    "cursor": "not-allowed",
-                                    "pointer-events": "none"
-                                });
-                                auctionEmailInput.prop("readonly", true).css({
-                                    "background": "#F3F4F6",
-                                    "cursor": "not-allowed"
-                                });
-                                container.find(".aees-proposal-card").addClass("locked").attr("data-locked", "true");
-                                container.find(".aees-proposal-card input, .aees-proposal-card textarea").prop("readonly", true).css("pointer-events", "none");
-                            } else {
-                                // Hide closed notice
-                                $('#aees-entry-closed-notice').slideUp(300);
-
-                                // Unlock proposal editing (only if email not sent)
-                                const emailStatus = aeesData.email_status;
-                                const isEmailSent = emailStatus && emailStatus.is_sent && !emailStatus.is_expired;
-
-                                if (!isEmailSent) {
-                                    container.find(".aees-edit-proposal, .aees-remove-proposal").prop("disabled", false).css({
-                                        "opacity": "1",
-                                        "cursor": "pointer",
-                                        "pointer-events": "auto"
-                                    });
-                                    auctionEmailInput.prop("readonly", false).css({
-                                        "background": "",
-                                        "cursor": "text"
-                                    });
-                                }
-                            }
-
                             // Update button states
                             updateButtonStates();
 
-                            // Show success message and reload if reopening (to clear proposals)
-                            const shouldReload = newStatus === 'open';
+                            // Always reload page to show correct notice from PHP template
+                            const shouldReload = true;
 
                             Swal.fire({
                                 icon: 'success',

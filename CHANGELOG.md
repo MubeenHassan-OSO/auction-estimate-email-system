@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.1] - 2025-01-28
+
+### Fixed
+- **Email Formatting Bug** - HTML and formatting now displays correctly in all emails
+  - Removed double sanitization that was stripping HTML formatting
+  - Proposal details in emails now preserve bold, italic, lists, and other formatting
+  - Data is still securely sanitized once with `wp_kses_post()` when saved to database
+  - Affected templates: user-proposals.php, admin-notification.php, admin-authorization-complete.php, admin-acceptance-notification.php
+- **Line Breaks Not Displaying in Emails** - Line breaks and paragraphs now render properly
+  - Added `wpautop()` function to convert plain text line breaks to HTML `<p>` and `<br>` tags
+  - Single line breaks → `<br>` tags
+  - Double line breaks → `<p>` paragraph tags with proper spacing
+  - Works with WYSIWYG editor content while preserving existing HTML
+  - Fixed in all 4 email templates
+- **Critical Security Bug** - Email links now properly invalidate when admin manually closes entry
+  - User response links (Accept/Reject) are now invalid if admin closes entry before user responds
+  - Auction house authorization links are now invalid if admin closes entry before authorization
+  - Prevents responses from being processed after admin has manually closed an entry
+  - Added entry status validation in `handle_proposal_response()` and `handle_authorization_response()` methods
+  - Users see clear error message: "This request has been closed by the administrator. This link is no longer valid."
+  - Ensures complete admin control over entry workflow
+
+### Security
+- Email link validation now includes entry status check
+- Prevents unauthorized responses after manual entry closure
+- Proper error messaging for closed entry link attempts
+
+### Technical Details
+- Updated `class-proposal-response-handler.php` with entry status validation
+- Modified all email templates to use `wpautop()` for line break conversion
+- Removed redundant `wp_kses_post()` calls from email output (data already sanitized on save)
+
+---
+
 ## [1.7.0] - 2025-01-27
 
 ### Added

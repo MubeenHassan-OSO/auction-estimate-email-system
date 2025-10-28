@@ -44,10 +44,13 @@ class AEES_Proposal_Response_Handler
         $proposal_data = $this->data_handler->get_proposal_data($entry_id);
         $all_proposals = $proposal_data['proposals'];
 
-        // Check if ANY proposal has been rejected or invalidated - if so, all proposals are invalid
+        // PRIORITY 1: Check if user has already responded (check this BEFORE entry status)
+        // This ensures correct message when user clicks link multiple times after responding
+
+        // Check if ANY proposal has been rejected - if so, all proposals were declined
         foreach ($all_proposals as $p) {
-            if ($p['status'] === 'rejected' || $p['status'] === 'invalid') {
-                set_transient('aees_response_error', 'You have already responded to this email by rejecting a proposal. All proposals in this email are now invalid.', 300);
+            if ($p['status'] === 'rejected') {
+                set_transient('aees_response_error', 'You have already declined all proposals in this email. All proposals are now invalid.', 300);
                 set_transient('aees_response_status', 'rejected', 300);
                 return;
             }
@@ -57,6 +60,15 @@ class AEES_Proposal_Response_Handler
         if ($proposal['status'] !== 'pending') {
             set_transient('aees_response_error', 'You have already responded to this request', 300);
             set_transient('aees_response_status', $proposal['status'], 300);
+            return;
+        }
+
+        // PRIORITY 2: Check if entry is manually closed by admin (only if user hasn't responded yet)
+        // This check comes AFTER response checks to avoid showing "closed by admin" when user already responded
+        $entry_status = $this->data_handler->get_entry_status($entry_id);
+        if ($entry_status === 'closed') {
+            set_transient('aees_response_error', 'This request has been closed by the administrator. This link is no longer valid.', 300);
+            set_transient('aees_response_status', 'closed', 300);
             return;
         }
 
@@ -102,13 +114,7 @@ class AEES_Proposal_Response_Handler
             return;
         }
 
-        // Check if proposal was accepted (required before authorization)
-        if ($token_data['status'] !== 'accepted') {
-            set_transient('aees_response_error', 'This proposal has not been accepted yet', 300);
-            return;
-        }
-
-        // Get full proposal data
+        // Get full proposal data (needed for status checks)
         $proposal_data = $this->data_handler->get_proposal_data($token_data['entry_id']);
         $proposals = $proposal_data['proposals'];
         $auction_email = $proposal_data['auction_email'];
@@ -127,10 +133,26 @@ class AEES_Proposal_Response_Handler
             return;
         }
 
-        // Check if already authorized
+        // PRIORITY 1: Check if already authorized (check this BEFORE entry status)
+        // This ensures correct message when auction house clicks link multiple times after authorizing
         if (isset($proposal['authorization_status']) && $proposal['authorization_status'] === 'authorized') {
             set_transient('aees_response_error', 'This proposal has already been authorized', 300);
             set_transient('aees_response_status', 'authorized', 300);
+            return;
+        }
+
+        // PRIORITY 2: Check if entry is manually closed by admin (only if not already authorized)
+        // This check comes AFTER authorization check to avoid showing "closed by admin" when already authorized
+        $entry_status = $this->data_handler->get_entry_status($token_data['entry_id']);
+        if ($entry_status === 'closed') {
+            set_transient('aees_response_error', 'This authorization request has been closed by the administrator. This link is no longer valid.', 300);
+            set_transient('aees_response_status', 'closed', 300);
+            return;
+        }
+
+        // Check if proposal was accepted (required before authorization)
+        if ($token_data['status'] !== 'accepted') {
+            set_transient('aees_response_error', 'This proposal has not been accepted yet', 300);
             return;
         }
 
@@ -144,10 +166,13 @@ class AEES_Proposal_Response_Handler
 
     /**
      * Process rejection
-     * When one proposal is rejected, ALL proposals in the batch become invalid
+     * When user clicks "Decline All Proposals", ALL proposals are marked as rejected
+     *
+     * Updated in v1.7.1: Changed to mark ALL proposals as "rejected" instead of "invalid"
+     * because the single "Decline All" button means user is explicitly rejecting all proposals
      *
      * @param int $entry_id The entry ID
-     * @param string $proposal_uid The proposal UID being rejected
+     * @param string $proposal_uid The proposal UID of the token used (doesn't matter which one)
      * @param array $proposal The proposal data
      * @param array $all_proposals All proposals in this batch
      */
@@ -157,27 +182,20 @@ class AEES_Proposal_Response_Handler
         $proposal_data = $this->data_handler->get_proposal_data($entry_id);
         $auction_email = $proposal_data['auction_email'];
 
-        // Mark the rejected proposal and invalidate all others
+        // Mark ALL proposals as rejected (user clicked "Decline All Proposals" button)
         foreach ($all_proposals as &$p) {
-            if ($p['uid'] === $proposal_uid) {
-                // This is the one user explicitly rejected
+            if ($p['status'] === 'pending') {
                 $p['status'] = 'rejected';
                 $p['user_response_date'] = current_time('mysql');
-            } else {
-                // All other proposals become invalid
-                if ($p['status'] === 'pending') {
-                    $p['status'] = 'invalid';
-                    $p['user_response_date'] = current_time('mysql');
-                }
             }
         }
 
         // Save back to custom table
         $this->data_handler->save_proposal_data($entry_id, $auction_email, $all_proposals);
 
-        // Save rejected/invalid proposals to history table for permanent record
+        // Save all rejected proposals to history table for permanent record
         foreach ($all_proposals as $p) {
-            if ($p['status'] === 'rejected' || $p['status'] === 'invalid') {
+            if ($p['status'] === 'rejected') {
                 $this->data_handler->save_proposal_to_history($entry_id, $p);
             }
         }

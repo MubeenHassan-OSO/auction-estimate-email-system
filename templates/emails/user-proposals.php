@@ -9,7 +9,7 @@ $site_name = get_bloginfo('name');
 $site_url = home_url('/');
 
 // Get logo URL
-$logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
+$logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpeg";
 
 ?>
 <!DOCTYPE html>
@@ -221,7 +221,7 @@ $logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
         .button-group {
             display: flex;
             gap: 12px;
-            justify-content: right;
+            justify-content: center;
         }
 
         .btn {
@@ -397,7 +397,11 @@ $logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
                             <!-- Details -->
                             <?php if (!empty($proposal['details'])): ?>
                                 <div class="details-section">
-                                    <?php echo wp_kses_post($proposal['details']); ?>
+                                    <?php
+                                    // Data is already sanitized with wp_kses_post() when saved
+                                    // Use wpautop() to convert line breaks to <p> and <br> tags
+                                    echo wpautop($proposal['details']);
+                                    ?>
                                 </div>
                             <?php endif; ?>
 
@@ -412,15 +416,11 @@ $logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
 
 
 
-                            <!-- Action Buttons -->
+                            <!-- Action Button -->
                             <?php
                             $response_token = $proposal['response_token'] ?? '';
                             $accept_url = add_query_arg([
                                 'aees_response' => 'accept',
-                                'token' => $response_token
-                            ], home_url('/proposal-response/'));
-                            $reject_url = add_query_arg([
-                                'aees_response' => 'reject',
                                 'token' => $response_token
                             ], home_url('/proposal-response/'));
                             ?>
@@ -428,12 +428,31 @@ $logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
                                 <a href="<?php echo esc_url($accept_url); ?>" class="btn btn-accept">
                                     ✓ Accept Proposal
                                 </a>
-                                <a href="<?php echo esc_url($reject_url); ?>" class="btn btn-decline">
-                                    ✕ Decline Proposal
-                                </a>
                             </div>
                         </div>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- Single Decline Button Section -->
+                <div style="margin-top: 40px; padding: 30px 20px; background: #F9FAFB; border-radius: 12px; text-align: center;">
+                    <p style="margin: 0 0 20px 0; color: #6B7280; font-size: 15px; line-height: 1.6;">
+                        <strong style="color: #374151;">Not interested in any of these proposals?</strong><br>
+                        You can decline all proposals below. This will notify our team that these estimates don't work for you.
+                    </p>
+                    <?php
+                    // Use the first proposal's token for decline (any rejection rejects all)
+                    $first_proposal_token = $proposals[0]['response_token'] ?? '';
+                    $decline_all_url = add_query_arg([
+                        'aees_response' => 'reject',
+                        'token' => $first_proposal_token
+                    ], home_url('/proposal-response/'));
+                    ?>
+                    <a href="<?php echo esc_url($decline_all_url); ?>" class="btn btn-decline-all" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none; background: #FFFFFF; color: #DC2626 !important; border: 2px solid #FCA5A5; transition: all 0.3s ease;">
+                        ✕ Decline Proposals
+                    </a>
+                    <p style="margin: 16px 0 0 0; color: #9CA3AF; font-size: 13px; font-style: italic;">
+                        This will decline all proposals shown above
+                    </p>
                 </div>
             </div>
 
@@ -449,4 +468,5 @@ $logo_url = $site_url . "/wp-content/uploads/2025/10/Main-Logo.png";
         </div>
     </div>
 </body>
+
 </html>

@@ -477,17 +477,21 @@ class AEES_Proposal_Data_Handler
 
     /**
      * Get rejection history for an entry
-     * Returns all proposals that were rejected or invalidated from history table
+     * Returns all proposals that were declined from history table
+     *
+     * Note: Still queries for both 'rejected' and 'invalid' for backward compatibility
+     * with old data. New rejections (v1.7.1+) mark all proposals as 'rejected'.
      *
      * @param int $entry_id The entry ID
-     * @return array Array of rejected/invalid proposals with metadata
+     * @return array Array of declined proposals with metadata
      */
     public function get_rejection_history($entry_id)
     {
         global $wpdb;
         $history_table = $wpdb->prefix . 'aees_proposal_history';
 
-        // Get only rejected or invalid proposals from history, ordered by most recent first
+        // Get only rejected/invalid proposals from history, ordered by most recent first
+        // Note: 'invalid' kept for backward compatibility with data from before v1.7.1
         $history = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT proposal_uid as uid,

@@ -39,7 +39,7 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
                         </span>
                     <?php endif; ?>
 
-                    <?php if (!empty($email_status) && $email_status['is_sent']): ?>
+                    <?php if (!empty($email_status) && $email_status['is_sent'] && $entry_status === 'open'): ?>
                         <span class="aees-badge aees-badge-success">✓ Email Sent</span>
                     <?php endif; ?>
                     <?php
@@ -53,7 +53,7 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
                             }
                         }
                     }
-                    if (!$has_user_response && !empty($email_status) && $email_status['is_sent']): ?>
+                    if (!$has_user_response && !empty($email_status) && $email_status['is_sent'] && $entry_status === 'open'): ?>
                         <span class="aees-badge aees-badge-warning">⏳ Awaiting Response</span>
                     <?php endif; ?>
                 </div>
@@ -78,7 +78,8 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
     </div>
 
     <!-- Email Sent Notification -->
-    <?php if (!empty($email_status) && $email_status['is_sent'] && !$email_status['is_expired'] && !$user_has_responded): ?>
+    <!-- Only show if entry is OPEN (don't show if manually closed or user responded) -->
+    <?php if (!empty($email_status) && $email_status['is_sent'] && !$email_status['is_expired'] && !$user_has_responded && $entry_status === 'open'): ?>
         <div class="aees-email-sent-notice">
             <div class="aees-email-sent-icon">✉️</div>
             <div class="aees-email-sent-content">
@@ -86,6 +87,34 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
                 <p>Proposals have been sent to the customer on <strong><?php echo wp_date(get_option('date_format') . ' at ' . get_option('time_format'), strtotime($email_status['email_sent_at'])); ?></strong></p>
                 <p style="margin: 8px 0 0 0; font-size: 13px; opacity: 0.9;">
                     📅 Expires: <?php echo wp_date(get_option('date_format') . ' at ' . get_option('time_format'), strtotime($email_status['email_expires_at'])); ?>
+                </p>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <!-- Manually Closed Notice (show when entry is closed manually without user response) -->
+    <?php if (!$user_has_responded && $entry_status === 'closed'): ?>
+        <div class="aees-response-notice" style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-left: 4px solid #F59E0B;">
+            <div class="aees-response-notice-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                🔒
+            </div>
+            <div class="aees-response-notice-content">
+                <h3 style="color: #92400E;">Entry Manually Closed</h3>
+                <p style="color: #78350F;">
+                    This entry has been manually closed by an administrator.
+                    <?php if (!empty($email_status) && $email_status['is_sent']): ?>
+                        <?php if (!$email_status['is_expired']): ?>
+                            Although an email was sent to the customer, the response links are now <strong>invalid</strong> and will not work.
+                        <?php else: ?>
+                            The email that was sent to the customer has expired.
+                        <?php endif; ?>
+                        <br>
+                        <strong>💡 To allow responses:</strong> Click the <strong>"Reopen Entry"</strong> button above to reactivate this entry.
+                    <?php else: ?>
+                        You cannot create new proposals or send emails while the entry is closed.
+                        <br>
+                        <strong>💡 To continue:</strong> Click the <strong>"Reopen Entry"</strong> button above to reactivate this entry.
+                    <?php endif; ?>
                 </p>
             </div>
         </div>
@@ -495,18 +524,6 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
                 <button type="button" id="aees-add-proposal" class="button button-primary">+ Add Proposal</button>
             </div>
         </div>
-
-        <!-- Entry Closed Notice (only show if manually closed, not from user response) -->
-        <?php if (isset($entry_status) && $entry_status === 'closed' && !$user_has_responded): ?>
-            <div class="aees-entry-closed-notice" id="aees-entry-closed-notice">
-                <div class="aees-entry-closed-icon">🔒</div>
-                <div class="aees-entry-closed-content">
-                    <h3>Entry Manually Closed</h3>
-                    <p>This entry was manually closed by an administrator. You cannot create new proposals or send emails while the entry is closed.</p>
-                    <p class="aees-entry-closed-action"><strong>To continue:</strong> Click the <strong>"Reopen Entry"</strong> button above to allow new proposals.</p>
-                </div>
-            </div>
-        <?php endif; ?>
 
         <!-- Auction email (editable) -->
         <div class="aees-field-group" style="margin-bottom:12px;">

@@ -128,7 +128,13 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                         <?php if (!empty($proposal['details'])): ?>
                                         <div>
                                             <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Details</div>
-                                            <div style="color: #4B5563; font-size: 14px; line-height: 1.6;"><?php echo wp_kses_post($proposal['details']); ?></div>
+                                            <div style="color: #4B5563; font-size: 14px; line-height: 1.6;">
+                                                <?php
+                                                // Data is already sanitized with wp_kses_post() when saved
+                                                // Use wpautop() to convert line breaks to <p> and <br> tags
+                                                echo wpautop($proposal['details']);
+                                                ?>
+                                            </div>
                                         </div>
                                         <?php endif; ?>
                                     </td>

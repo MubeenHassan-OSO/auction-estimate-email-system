@@ -1,6 +1,6 @@
 # Auction Estimate Email System (AEES)
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 **Author:** Mubeen Hassan
 **Requires WordPress:** 5.0 or higher
 **Requires PHP:** 7.2 or higher

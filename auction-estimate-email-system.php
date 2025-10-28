@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Auction Estimate Email System
  * Description: Custom add-on to manage and email Forminator form submissions.
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: Mubeen Hassan
  * Text Domain: auction-estimate-email-system
  * Domain Path: /languages
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) exit;
 
 define('AEES_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AEES_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('AEES_VERSION', '1.7.0');
+define('AEES_VERSION', '1.7.1');
 
 // Load core classes
 require_once AEES_PLUGIN_DIR . 'includes/class-submission-table.php';
