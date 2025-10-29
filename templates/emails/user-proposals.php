@@ -9,7 +9,7 @@ $site_name = get_bloginfo('name');
 $site_url = home_url('/');
 
 // Get logo URL
-$logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpeg";
+$logo_url = $site_url . "wp-content/uploads/2025/10/Main-Logo.png";
 
 ?>
 <!DOCTYPE html>
@@ -221,7 +221,7 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
         .button-group {
             display: flex;
             gap: 12px;
-            justify-content: center;
+            justify-content: right;
         }
 
         .btn {
@@ -251,15 +251,45 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
             box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
         }
 
-        .btn-decline {
-            background: #FFFFFF;
-            color: #DC2626 !important;
-            border: 2px solid #FCA5A5;
+        .decline-wrapper {
+            margin-top: 20px;
+            padding: 30px 20px;
+            background: #ff000008;
+            border: 1px solid #ff000052;
+            border-radius: 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
 
-        .btn-decline:hover {
-            background: #FEF2F2;
+        h3.decline-heading {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.4em;
+        }
+
+        p.decline-details {
+            font-size: 16px;
+            color: grey;
+            font-weight: 400;
+            width: 95%;
+            line-height: 1.3em;
+        }    
+
+        .btn-decline-all{
+            background: #FFFFFF; 
+            color: #DC2626 !important; 
+            border: 2px solid #FCA5A5; 
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-decline-all:hover {
+            background: #DC2626;
             border-color: #DC2626;
+            color: #FFFFFF !important;
         }
 
         /* Footer Section */
@@ -308,6 +338,8 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
 
             .header-title {
                 font-size: 24px;
+                line-height: 1.3em;
+                margin: 10px 0;
             }
 
             .header-subtitle {
@@ -333,12 +365,12 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
 
             .price-section {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
+                align-items: center;
+                gap: 0;
             }
 
             .price-value {
-                font-size: 28px;
+                font-size: 24px;
             }
 
             .button-group {
@@ -365,7 +397,7 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
                 <?php if (!empty($logo_url)): ?>
                     <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($site_name); ?>" class="header-logo">
                 <?php endif; ?>
-                <h1 class="header-title">Your Auction Estimates Are Ready! 📦</h1>
+                <h1 class="header-title">Your Auction Estimates Are Ready!</h1>
                 <p class="header-subtitle">We've received quotes from our trusted auction partners</p>
             </div>
 
@@ -434,9 +466,9 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
                 </div>
 
                 <!-- Single Decline Button Section -->
-                <div style="margin-top: 40px; padding: 30px 20px; background: #F9FAFB; border-radius: 12px; text-align: center;">
-                    <p style="margin: 0 0 20px 0; color: #6B7280; font-size: 15px; line-height: 1.6;">
-                        <strong style="color: #374151;">Not interested in any of these proposals?</strong><br>
+                <div class="decline-wrapper">
+                    <h3 class="decline-heading">Not interested in any of these proposals?</h3>
+                    <p class="decline-details">
                         You can decline all proposals below. This will notify our team that these estimates don't work for you.
                     </p>
                     <?php
@@ -447,10 +479,10 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
                         'token' => $first_proposal_token
                     ], home_url('/proposal-response/'));
                     ?>
-                    <a href="<?php echo esc_url($decline_all_url); ?>" class="btn btn-decline-all" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 600; text-decoration: none; background: #FFFFFF; color: #DC2626 !important; border: 2px solid #FCA5A5; transition: all 0.3s ease;">
+                    <a href="<?php echo esc_url($decline_all_url); ?>" class="btn btn-decline-all">
                         ✕ Decline Proposals
                     </a>
-                    <p style="margin: 16px 0 0 0; color: #9CA3AF; font-size: 13px; font-style: italic;">
+                    <p style="color: #9CA3AF; font-size: 13px; font-style: italic;">
                         This will decline all proposals shown above
                     </p>
                 </div>
