@@ -9,7 +9,7 @@ $site_name = get_bloginfo('name');
 $site_url = home_url('/');
 
 // Get logo URL
-$logo_url = $site_url . "wp-content/uploads/2025/10/Main-Logo.png";
+$logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpeg";
 
 ?>
 <!DOCTYPE html>
@@ -389,8 +389,11 @@ $logo_url = $site_url . "wp-content/uploads/2025/10/Main-Logo.png";
 </head>
 
 <body>
-    <div class="email-wrapper">
-        <div class="email-container">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9FAFB;">
+        <tr>
+            <td align="center">
+                <div class="email-wrapper">
+                    <div class="email-container">
 
             <!-- Header -->
             <div class="email-header">
@@ -416,9 +419,13 @@ $logo_url = $site_url . "wp-content/uploads/2025/10/Main-Logo.png";
                             <!-- Proposal Header -->
                             <div class="proposal-header">
                                 <div class="proposal-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zm10 16H4V9h16v11z" />
-                                    </svg>
+                                    <?php if (!empty($proposal['image'])): ?>
+                                        <img src="<?php echo esc_url($proposal['image']); ?>" alt="<?php echo esc_attr($proposal['title']); ?>" style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" />
+                                    <?php else: ?>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                            <path d="M20 7h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM10 4h4v3h-4V4zm10 16H4V9h16v11z" />
+                                        </svg>
+                                    <?php endif; ?>
                                 </div>
                                 <h3 class="proposal-title">
                                     <?php echo esc_html($proposal['title'] ?? 'Proposal #' . ($index + 1)); ?>
@@ -497,8 +504,11 @@ $logo_url = $site_url . "wp-content/uploads/2025/10/Main-Logo.png";
                 </div>
             </div>
 
-        </div>
-    </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
 </body>
 
 </html>

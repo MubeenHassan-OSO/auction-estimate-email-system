@@ -3,8 +3,27 @@ jQuery(document).ready(function ($) {
     const saveBtn = $("#aees-save-entry");
     const emailBtn = $("#aees-send-email");
     const addBtn = $("#aees-add-proposal");
+    const auctionHouseSelect = $("#aees-auction-house-select");
+    const auctionNameInput = $("#aees-auction-name");
     const auctionEmailInput = $("#aees-auction-email");
     let unsavedChanges = false;
+
+    // Handle auction house dropdown selection
+    auctionHouseSelect.on("change", function () {
+        const selectedOption = $(this).find("option:selected");
+        const auctionName = selectedOption.data("name") || "";
+        const auctionEmail = selectedOption.data("email") || "";
+
+        // Update hidden fields
+        auctionNameInput.val(auctionName);
+        auctionEmailInput.val(auctionEmail);
+
+        // Remove error styling if present
+        $(this).css("border-color", "");
+
+        // Mark as unsaved
+        setUnsaved(true);
+    });
 
     // helpers
     function setUnsaved(flag) {
@@ -104,12 +123,14 @@ jQuery(document).ready(function ($) {
     }
 
     // create proposal DOM block
-    function buildProposalHTML(index, uid = '', title = '', price = '', details = '', locked = false, saved = false) {
+    function buildProposalHTML(index, uid = '', title = '', price = '', details = '', locked = false, saved = false, image = '') {
         const lockedAttr = locked ? 'locked' : '';
         const readonlyAttr = locked ? 'readonly' : '';
+        const readonlyDataAttr = locked ? 'data-readonly="true"' : 'data-readonly="false"';
         const dataSaved = saved ? ' data-saved="true"' : '';
         const dataLocked = locked ? ' data-locked="true"' : ' data-locked="false"';
         const editorId = 'aees-details-' + index;
+        const hasImage = image && image.trim() !== '';
 
         return `
             <div class="aees-proposal-card ${lockedAttr}" ${dataLocked} ${dataSaved} data-uid="${uid}">
@@ -124,6 +145,19 @@ jQuery(document).ready(function ($) {
                     <div class="aees-field-group">
                         <label>Proposal Title</label>
                         <input type="text" name="proposals[${index}][title]" value="${escapeHtml(title)}" ${readonlyAttr} placeholder="e.g., Standard Shipping & Appraisal" maxlength="200" />
+                    </div>
+                    <div class="aees-field-group">
+                        <label>Icon/Image <span style="color: #999; font-weight: normal;">(Optional)</span></label>
+                        <div class="aees-image-upload-wrapper">
+                            <input type="hidden" name="proposals[${index}][image]" class="aees-proposal-image" value="${escapeHtml(image)}" />
+                            <div class="aees-image-preview">
+                                ${hasImage ? `<img src="${escapeHtml(image)}" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />` : ''}
+                            </div>
+                            <button type="button" class="button aees-upload-image-btn" ${readonlyDataAttr}>
+                                <span class="dashicons dashicons-format-image"></span> ${hasImage ? 'Change Image' : 'Upload Image'}
+                            </button>
+                            ${hasImage ? `<button type="button" class="button aees-remove-image-btn" ${readonlyDataAttr} style="margin-left: 8px;"><span class="dashicons dashicons-no-alt"></span> Remove</button>` : ''}
+                        </div>
                     </div>
                     <div class="aees-field-group">
                         <label>Price</label>
@@ -174,8 +208,8 @@ jQuery(document).ready(function ($) {
             "pointer-events": "none"
         });
 
-        // Lock auction email input
-        auctionEmailInput.prop("readonly", true).css({
+        // Lock auction house dropdown
+        auctionHouseSelect.prop("disabled", true).css({
             "background": "#F3F4F6",
             "cursor": "not-allowed"
         });
@@ -199,7 +233,7 @@ jQuery(document).ready(function ($) {
             "pointer-events": "none"
         });
 
-        auctionEmailInput.prop("readonly", true).css({
+        auctionHouseSelect.prop("disabled", true).css({
             "background": "#F3F4F6",
             "cursor": "not-allowed"
         });
@@ -319,32 +353,8 @@ jQuery(document).ready(function ($) {
         setUnsaved(true);
     });
 
-    // Auction email validation on input and blur
-    auctionEmailInput.on("input", function () {
-        const email = $(this).val().trim();
-        // Remove red border when user starts typing
-        if (email) {
-            $(this).css("border-color", "");
-        }
-        setUnsaved(true);
-    });
-
-    auctionEmailInput.on("blur", function () {
-        const email = $(this).val().trim();
-        if (!email) {
-            // Empty field - required
-            $(this).css("border-color", "#dc3545");
-            $(this).attr("title", "This field is required");
-        } else if (!isValidEmail(email)) {
-            // Invalid email format
-            $(this).css("border-color", "#dc3545");
-            $(this).attr("title", "Please enter a valid email address");
-        } else {
-            // Valid email
-            $(this).css("border-color", "#10B981");
-            $(this).attr("title", "");
-        }
-    });
+    // Removed: Old auction email input validation handlers
+    // Now using dropdown selection instead
 
     // Collect proposals from DOM (order may not matter)
     function collectProposals() {
@@ -367,8 +377,9 @@ jQuery(document).ready(function ($) {
             }
 
             details = $c.find("textarea[name*='[details]']").val() || '';
+            const image = $c.find(".aees-proposal-image").val() || '';
 
-            arr.push({ uid: uid, title: title, price: price, details: details });
+            arr.push({ uid: uid, title: title, price: price, details: details, image: image });
         });
         return arr;
     }
@@ -381,29 +392,20 @@ jQuery(document).ready(function ($) {
         const proposals = collectProposals();
         const auctionEmail = auctionEmailInput.val().trim();
 
-        // Validate auction email is required
+        // Validate auction house is selected
         if (!auctionEmail || auctionEmail === '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Required Field',
-                text: 'Auction House Email is required. Please enter a valid email address.',
+                text: 'Please select an auction house from the dropdown.',
                 confirmButtonColor: '#2271b1'
             });
-            auctionEmailInput.focus().css("border-color", "#dc3545");
+            auctionHouseSelect.focus().css("border-color", "#dc3545");
             return;
         }
 
-        // Validate auction email format
-        if (!isValidEmail(auctionEmail)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Email',
-                text: 'Please enter a valid email address for the auction house.',
-                confirmButtonColor: '#2271b1'
-            });
-            auctionEmailInput.focus().css("border-color", "#dc3545");
-            return;
-        }
+        // Email validation is handled by dropdown selection (already validated in settings)
+        // No need for additional email format validation here
 
         // Check if there are any proposal cards on the page
         const proposalCardsCount = container.find(".aees-proposal-card").length;
@@ -841,5 +843,103 @@ jQuery(document).ready(function ($) {
             content.addClass("open").slideDown(300);
             icon.text("−");
         }
+    });
+
+    // WordPress Media Uploader for Proposal Images
+    let mediaUploader;
+
+    container.on("click", ".aees-upload-image-btn", function (e) {
+        e.preventDefault();
+
+        const $button = $(this);
+        const $wrapper = $button.closest(".aees-image-upload-wrapper");
+        const $imageInput = $wrapper.find(".aees-proposal-image");
+        const $imagePreview = $wrapper.find(".aees-image-preview");
+        const isReadonly = $button.attr("data-readonly") === "true";
+
+        // Don't allow upload if readonly (locked proposal)
+        if (isReadonly) {
+            return;
+        }
+
+        // If the uploader object has already been created, reopen the dialog
+        if (mediaUploader) {
+            mediaUploader.open();
+            return;
+        }
+
+        // Create the media uploader
+        mediaUploader = wp.media({
+            title: 'Choose Proposal Icon/Image',
+            button: {
+                text: 'Use this image'
+            },
+            multiple: false,
+            library: {
+                type: 'image'
+            }
+        });
+
+        // When an image is selected, run a callback
+        mediaUploader.on('select', function () {
+            const attachment = mediaUploader.state().get('selection').first().toJSON();
+            const imageUrl = attachment.url;
+
+            // Update the hidden input
+            $imageInput.val(imageUrl);
+
+            // Update the preview
+            $imagePreview.html(`<img src="${imageUrl}" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />`);
+
+            // Update button text
+            $button.html('<span class="dashicons dashicons-format-image"></span> Change Image');
+
+            // Add remove button if it doesn't exist
+            if ($wrapper.find(".aees-remove-image-btn").length === 0) {
+                $button.after(`
+                    <button type="button" class="button aees-remove-image-btn" data-readonly="false" style="margin-left: 8px;">
+                        <span class="dashicons dashicons-no-alt"></span> Remove
+                    </button>
+                `);
+            }
+
+            // Mark as unsaved
+            setUnsaved(true);
+        });
+
+        // Open the uploader dialog
+        mediaUploader.open();
+    });
+
+    // Remove proposal image
+    container.on("click", ".aees-remove-image-btn", function (e) {
+        e.preventDefault();
+
+        const $button = $(this);
+        const $wrapper = $button.closest(".aees-image-upload-wrapper");
+        const $imageInput = $wrapper.find(".aees-proposal-image");
+        const $imagePreview = $wrapper.find(".aees-image-preview");
+        const $uploadBtn = $wrapper.find(".aees-upload-image-btn");
+        const isReadonly = $button.attr("data-readonly") === "true";
+
+        // Don't allow removal if readonly (locked proposal)
+        if (isReadonly) {
+            return;
+        }
+
+        // Clear the hidden input
+        $imageInput.val('');
+
+        // Clear the preview
+        $imagePreview.empty();
+
+        // Update upload button text
+        $uploadBtn.html('<span class="dashicons dashicons-format-image"></span> Upload Image');
+
+        // Remove the remove button
+        $button.remove();
+
+        // Mark as unsaved
+        setUnsaved(true);
     });
 });

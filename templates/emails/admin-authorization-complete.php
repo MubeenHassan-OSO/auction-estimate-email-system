@@ -22,8 +22,81 @@ $user_email = $form_data['user_email'] ?? 'Not available';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authorization Complete - Order Confirmed</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #F3F4F6;
+            line-height: 1.6;
+        }
+
+        .info-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            flex: 0 0 180px;
+            color: #6B7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .info-value {
+            flex: 1;
+            color: #1F2937;
+            font-size: 14px;
+        }
+
+        .info-value-bold {
+            font-weight: 600;
+        }
+
+        .timeline-row {
+            display: flex;
+            padding: 4px 0;
+        }
+
+        .timeline-label {
+            flex: 0 0 140px;
+            color: #78350F;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .timeline-value {
+            flex: 1;
+            color: #92400E;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .info-row,
+            .timeline-row {
+                flex-direction: column;
+            }
+
+            .info-label,
+            .timeline-label {
+                flex: none;
+                margin-bottom: 4px;
+            }
+
+            .info-value,
+            .timeline-value {
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #F3F4F6; line-height: 1.6;">
+<body>
 
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F3F4F6; padding: 40px 20px;">
         <tr>
@@ -71,16 +144,16 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Authorization Details
                                         </h3>
-                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6B7280; font-size: 14px; font-weight: 500; width: 180px;">Authorized By:</td>
-                                                <td style="padding: 8px 0; color: #1F2937; font-size: 14px; font-weight: 600;"><?php echo esc_html($auction_email); ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6B7280; font-size: 14px; font-weight: 500;">Authorization Date:</td>
-                                                <td style="padding: 8px 0; color: #1F2937; font-size: 14px;"><?php echo wp_date('F j, Y @ g:i A'); ?></td>
-                                            </tr>
-                                        </table>
+                                        <div>
+                                            <div class="info-row">
+                                                <div class="info-label">Authorized By:</div>
+                                                <div class="info-value info-value-bold"><?php echo esc_html($auction_email); ?></div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="info-label">Authorization Date:</div>
+                                                <div class="info-value"><?php echo wp_date('F j, Y @ g:i A'); ?></div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -92,20 +165,20 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Order Details
                                         </h3>
-                                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6B7280; font-size: 14px; font-weight: 500; width: 180px;">Entry ID:</td>
-                                                <td style="padding: 8px 0; color: #1F2937; font-size: 14px; font-weight: 600;">#<?php echo esc_html($entry_id); ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6B7280; font-size: 14px; font-weight: 500;">Customer Email:</td>
-                                                <td style="padding: 8px 0; color: #1F2937; font-size: 14px;"><?php echo esc_html($user_email); ?></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6B7280; font-size: 14px; font-weight: 500;">Customer Accepted:</td>
-                                                <td style="padding: 8px 0; color: #1F2937; font-size: 14px;"><?php echo wp_date('F j, Y @ g:i A', strtotime($proposal['user_response_date'])); ?></td>
-                                            </tr>
-                                        </table>
+                                        <div>
+                                            <div class="info-row">
+                                                <div class="info-label">Entry ID:</div>
+                                                <div class="info-value info-value-bold">#<?php echo esc_html($entry_id); ?></div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="info-label">Customer Email:</div>
+                                                <div class="info-value"><?php echo esc_html($user_email); ?></div>
+                                            </div>
+                                            <div class="info-row">
+                                                <div class="info-label">Customer Accepted:</div>
+                                                <div class="info-value"><?php echo wp_date('F j, Y @ g:i A', strtotime($proposal['user_response_date'])); ?></div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             </table>
@@ -158,20 +231,20 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                     <td style="padding: 20px;">
                                         <div style="color: #92400E; font-size: 14px; line-height: 1.6;">
                                             <strong style="display: block; margin-bottom: 12px; font-size: 16px;">📅 Complete Timeline:</strong>
-                                            <table width="100%" cellpadding="4" cellspacing="0" border="0" style="font-size: 13px;">
-                                                <tr>
-                                                    <td style="color: #78350F; padding: 4px 0;"><strong>1. Submitted:</strong></td>
-                                                    <td style="color: #92400E; padding: 4px 0;"><?php echo !empty($form_data['date_created']) ? wp_date('M j, Y', strtotime($form_data['date_created'])) : 'N/A'; ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="color: #78350F; padding: 4px 0;"><strong>2. User Accepted:</strong></td>
-                                                    <td style="color: #92400E; padding: 4px 0;"><?php echo wp_date('M j, Y @ g:i A', strtotime($proposal['user_response_date'])); ?></td>
-                                                </tr>
-                                                <tr>
-                                                    <td style="color: #78350F; padding: 4px 0;"><strong>3. Authorized:</strong></td>
-                                                    <td style="color: #92400E; padding: 4px 0;"><?php echo wp_date('M j, Y @ g:i A'); ?></td>
-                                                </tr>
-                                            </table>
+                                            <div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-label">1. Submitted:</div>
+                                                    <div class="timeline-value"><?php echo !empty($form_data['date_created']) ? wp_date('M j, Y', strtotime($form_data['date_created'])) : 'N/A'; ?></div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-label">2. User Accepted:</div>
+                                                    <div class="timeline-value"><?php echo wp_date('M j, Y @ g:i A', strtotime($proposal['user_response_date'])); ?></div>
+                                                </div>
+                                                <div class="timeline-row">
+                                                    <div class="timeline-label">3. Authorized:</div>
+                                                    <div class="timeline-value"><?php echo wp_date('M j, Y @ g:i A'); ?></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>

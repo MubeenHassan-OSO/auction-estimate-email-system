@@ -118,33 +118,9 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
             font-size: 14px;
         }
 
-        /* Data Table */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 12px 0;
-            font-size: 14px;
-        }
-
-        .data-table th {
-            background: #f9fafb;
-            padding: 10px;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            border: 1px solid #e5e7eb;
-        }
-
-        .data-table td {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            color: #111827;
-        }
-
-        .data-table td:first-child {
-            font-weight: 600;
-            width: 40%;
-            background: #f9fafb;
+        /* Data Section */
+        .data-section {
+            margin: 16px 0;
         }
 
         .group-title {
@@ -191,25 +167,49 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
 
         /* Responsive */
         @media (max-width: 600px) {
+            .email-container {
+                margin: 20px auto;
+            }
+
+            .email-header {
+                padding: 30px 20px;
+            }
+
+            .email-header h1 {
+                font-size: 20px;
+            }
+
             .email-body {
                 padding: 24px 16px;
             }
 
+            .info-card {
+                padding: 16px;
+            }
+
             .info-row {
                 flex-direction: column;
+                padding: 12px 0;
             }
 
             .info-label {
-                margin-bottom: 4px;
+                flex: none;
+                margin-bottom: 6px;
+                font-size: 13px;
+            }
+
+            .info-value {
+                font-size: 14px;
             }
 
             .btn-authorize {
                 display: block;
                 width: 100%;
+                padding: 12px 24px;
             }
 
-            .data-table td:first-child {
-                width: 35%;
+            .group-title {
+                font-size: 13px;
             }
         }
     </style>
@@ -231,49 +231,96 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
                             <p>A new estimate request has been submitted. Please review the details below and authorize if you can proceed.</p>
                         </div>
 
-                        <h2 style="margin:0 0 20px 0; font-size:20px; font-weight:700; color:#111827;">Submitted Information</h2>
-
                         <?php if (!empty($form_data['grouped_data'])): ?>
                             <div class="info-card">
-                                <h3>Form Submission Details</h3>
-                                <?php foreach ($form_data['grouped_data'] as $group): ?>
+                                <h2>Form Submission Details</h2>
+                                <?php
+                                // Define fields to show from Other Information/ungrouped group
+                                $other_info_allowed_fields = ['Insured Value', 'Customs Value', 'Contact Email'];
+
+                                foreach ($form_data['grouped_data'] as $group_id => $group):
+                                    $group_title = $group['title'];
+
+                                    // Filter logic based on group
+                                    $should_show_group = false;
+                                    $filtered_data = [];
+
+                                    // Handle "Other Information" / ungrouped - show only specific fields
+                                    if ($group_id === 'ungrouped' || stripos($group_title, 'Other Info') !== false) {
+                                        if (!empty($group['fields'])) {
+                                            foreach ($group['fields'] as $field) {
+                                                // Check if field is in allowed list OR if it's an invoice/upload field
+                                                $is_allowed = in_array($field['label'], $other_info_allowed_fields);
+                                                $is_invoice = stripos($field['label'], 'Invoice') !== false || stripos($field['label'], 'Attach') !== false;
+
+                                                if (!empty($field['raw_value']) && ($is_allowed || $is_invoice)) {
+                                                    $filtered_data[] = $field;
+                                                    $should_show_group = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Handle "Seller" group - only show first row
+                                    elseif (stripos($group_title, 'Seller') !== false) {
+                                        if ($group['is_repeater'] && !empty($group['rows'])) {
+                                            // Get only the first row
+                                            $first_row = reset($group['rows']);
+                                            if ($first_row) {
+                                                foreach ($first_row as $field) {
+                                                    if (!empty($field['raw_value'])) {
+                                                        $filtered_data[] = $field;
+                                                        $should_show_group = true;
+                                                    }
+                                                }
+                                            }
+                                        } elseif (!empty($group['fields'])) {
+                                            foreach ($group['fields'] as $field) {
+                                                if (!empty($field['raw_value'])) {
+                                                    $filtered_data[] = $field;
+                                                    $should_show_group = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    // Handle "Ship To" group - show if exists
+                                    elseif (stripos($group_title, 'Ship To') !== false || stripos($group_title, 'Shipping') !== false) {
+                                        if ($group['is_repeater'] && !empty($group['rows'])) {
+                                            foreach ($group['rows'] as $row_fields) {
+                                                foreach ($row_fields as $field) {
+                                                    if (!empty($field['raw_value'])) {
+                                                        $filtered_data[] = $field;
+                                                        $should_show_group = true;
+                                                    }
+                                                }
+                                            }
+                                        } elseif (!empty($group['fields'])) {
+                                            foreach ($group['fields'] as $field) {
+                                                if (!empty($field['raw_value'])) {
+                                                    $filtered_data[] = $field;
+                                                    $should_show_group = true;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Display the group if we have data to show
+                                    if ($should_show_group && !empty($filtered_data)):
+                                ?>
                                     <h4 class="group-title">
-                                        <?php echo esc_html($group['title']); ?>
+                                        <?php echo esc_html($group_title); ?>
                                     </h4>
-                                    <table class="data-table">
-                                        <tbody>
-                                            <?php
-                                            // Handle repeater groups
-                                            if ($group['is_repeater'] && !empty($group['rows'])):
-                                                foreach ($group['rows'] as $row_fields):
-                                                    foreach ($row_fields as $field):
-                                                        if (!empty($field['raw_value'])):
-                                            ?>
-                                                            <tr>
-                                                                <td style="font-weight:600; width:40%;"><?php echo esc_html($field['label']); ?></td>
-                                                                <td><?php echo $field['value']; ?></td>
-                                                            </tr>
-                                            <?php
-                                                        endif;
-                                                    endforeach;
-                                                endforeach;
-                                            // Handle regular groups
-                                            elseif (!empty($group['fields'])):
-                                                foreach ($group['fields'] as $field):
-                                                    if (!empty($field['raw_value'])):
-                                            ?>
-                                                        <tr>
-                                                            <td style="font-weight:600; width:40%;"><?php echo esc_html($field['label']); ?></td>
-                                                            <td><?php echo $field['value']; ?></td>
-                                                        </tr>
-                                            <?php
-                                                    endif;
-                                                endforeach;
-                                            endif;
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                <?php endforeach; ?>
+                                    <div class="data-section">
+                                        <?php foreach ($filtered_data as $field): ?>
+                                            <div class="info-row">
+                                                <div class="info-label"><?php echo esc_html($field['label']); ?></div>
+                                                <div class="info-value"><?php echo $field['value']; ?></div>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php
+                                    endif;
+                                endforeach;
+                                ?>
                             </div>
                         <?php endif; ?>
 

@@ -190,6 +190,7 @@ class AEES_Edit_Entry_Page
             $title = isset($p['title']) ? sanitize_text_field($p['title']) : '';
             $price = isset($p['price']) ? sanitize_text_field($p['price']) : '';
             $details = isset($p['details']) ? wp_kses_post($p['details']) : '';
+            $image = isset($p['image']) ? esc_url_raw($p['image']) : '';
 
             // Skip completely empty proposals
             if ($title === '' && $price === '' && $details === '') {
@@ -222,6 +223,7 @@ class AEES_Edit_Entry_Page
                 'title' => $title,
                 'price' => $price,
                 'details' => $details,
+                'image' => $image,
                 'status' => $existing_status,
                 'user_response_date' => $existing_response_date,
                 'response_token' => $response_token,

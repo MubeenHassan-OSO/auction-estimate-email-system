@@ -525,10 +525,33 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
             </div>
         </div>
 
-        <!-- Auction email (editable) -->
+        <!-- Auction House Dropdown -->
         <div class="aees-field-group" style="margin-bottom:12px;">
-            <label>Auction House Email <span style="color: #dc3545; font-weight: 700;">*</span></label>
-            <input type="email" id="aees-auction-email" value="<?php echo esc_attr($auction_email); ?>" placeholder="auction@house.com" required />
+            <label>Select Auction House <span style="color: #dc3545; font-weight: 700;">*</span></label>
+            <?php
+            $auction_houses = AEES_Settings_Page::get_auction_houses();
+            $current_auction_email = $auction_email; // Keep for backward compatibility
+            ?>
+            <select id="aees-auction-house-select" required style="width: 100%; max-width: 400px;">
+                <option value="">-- Select Auction House --</option>
+                <?php foreach ($auction_houses as $index => $house): ?>
+                    <option value="<?php echo esc_attr($index); ?>"
+                            data-name="<?php echo esc_attr($house['name']); ?>"
+                            data-email="<?php echo esc_attr($house['email']); ?>"
+                            <?php selected($house['email'], $current_auction_email); ?>>
+                        <?php echo esc_html($house['name']) . ' (' . esc_html($house['email']) . ')'; ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <?php if (empty($auction_houses)): ?>
+                <p class="description" style="color: #dc3545; margin-top: 8px;">
+                    <strong>No auction houses configured.</strong> Please add auction houses in
+                    <a href="<?php echo admin_url('admin.php?page=aees-settings'); ?>">Settings</a> first.
+                </p>
+            <?php endif; ?>
+            <!-- Hidden fields to store selected auction house data -->
+            <input type="hidden" id="aees-auction-name" value="" />
+            <input type="hidden" id="aees-auction-email" value="<?php echo esc_attr($current_auction_email); ?>" />
         </div>
 
         <div id="aees-proposals-wrap">
@@ -547,6 +570,26 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
                             <div class="aees-field-group">
                                 <label>Proposal Title</label>
                                 <input type="text" name="proposals[<?php echo $i; ?>][title]" value="<?php echo esc_attr($p['title']); ?>" readonly placeholder="e.g., Standard Shipping & Appraisal" maxlength="200" />
+                            </div>
+
+                            <div class="aees-field-group">
+                                <label>Icon/Image <span style="color: #999; font-weight: normal;">(Optional)</span></label>
+                                <div class="aees-image-upload-wrapper">
+                                    <input type="hidden" name="proposals[<?php echo $i; ?>][image]" class="aees-proposal-image" value="<?php echo esc_attr($p['image'] ?? ''); ?>" />
+                                    <div class="aees-image-preview">
+                                        <?php if (!empty($p['image'])): ?>
+                                            <img src="<?php echo esc_url($p['image']); ?>" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />
+                                        <?php endif; ?>
+                                    </div>
+                                    <button type="button" class="button aees-upload-image-btn" data-readonly="true">
+                                        <span class="dashicons dashicons-format-image"></span> <?php echo !empty($p['image']) ? 'Change Image' : 'Upload Image'; ?>
+                                    </button>
+                                    <?php if (!empty($p['image'])): ?>
+                                        <button type="button" class="button aees-remove-image-btn" data-readonly="true" style="margin-left: 8px;">
+                                            <span class="dashicons dashicons-no-alt"></span> Remove
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
                             </div>
 
                             <div class="aees-field-group">
