@@ -532,7 +532,7 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
             $auction_houses = AEES_Settings_Page::get_auction_houses();
             $current_auction_email = $auction_email; // Keep for backward compatibility
             ?>
-            <select id="aees-auction-house-select" required style="width: 100%; max-width: 400px;">
+            <select id="aees-auction-house-select" required style="width: 100%; max-width: 400px; height: 44px; border-radius: 8px; margin-bottom: 10px; padding: 7px 15px;">
                 <option value="">-- Select Auction House --</option>
                 <?php foreach ($auction_houses as $index => $house): ?>
                     <option value="<?php echo esc_attr($index); ?>"

@@ -87,7 +87,9 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
             padding: 24px;
             margin-bottom: 24px;
         }
-
+        .info-card h2 {
+    text-align: center;
+}
         .info-card h3 {
             margin: 0 0 16px 0;
             font-size: 16px;
@@ -134,7 +136,7 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
 
         /* Button */
         .btn-authorize {
-            display: inline-block;
+            display: inline;
             padding: 14px 32px;
             background: #10b981;
             color: #fff !important;
@@ -155,14 +157,38 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
             margin: 32px 0;
         }
 
-        /* Footer */
+         /* Footer Section */
         .email-footer {
-            background: #f9fafb;
+            background: #F9FAFB;
             padding: 20px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .footer-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667EEA;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .footer-info {
             text-align: center;
-            font-size: 13px;
-            color: #6b7280;
-            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer-brand {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+            margin: 0;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            color: #9CA3AF;
+            margin: 0;
         }
 
         /* Responsive */
@@ -218,15 +244,15 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
 <body>
     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f3f4f6; padding:20px;">
         <tr>
-            <td align="center">
+            <td align="left">
                 <div class="email-container">
                     <div class="email-header">
-                        <h1>🎉 New Authorization Request</h1>
+                        <h1>New Authorization Request</h1>
                         <p>Please review the submitted information and authorize</p>
                     </div>
 
                     <div class="email-body">
-                        <div class="alert-box">
+                        <div class="alert-box" style="background: #d1fae55c; border-radius: 8px; border: 1px solid #92ffc7; margin-bottom: 30px; padding: 20px;">
                             <strong>Action Required</strong>
                             <p>A new estimate request has been submitted. Please review the details below and authorize if you can proceed.</p>
                         </div>
@@ -340,9 +366,12 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
                     </div>
 
                     <div class="email-footer">
-                        <p style="margin:0;">This is an automated message from <?php echo esc_html($site_name); ?></p>
-                        <p style="margin:8px 0 0 0;">If you did not expect this request, please contact us immediately.</p>
-                    </div>
+
+                <div class="footer-info">
+                    <p class="footer-brand"><?php echo esc_html($site_name); ?></p>
+                    <p class="footer-copyright">&copy; <?php echo date('Y'); ?> All rights reserved.</p>
+                </div>
+            </div>
                 </div>
             </td>
         </tr>

@@ -91,6 +91,7 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
             display: flex;
             flex-direction: column;
             gap: 10px;
+            text-align: left;
         }
 
         .greeting {
@@ -150,13 +151,13 @@ $logo_url = $site_url . "wp-content/uploads/2023/08/Main_logo-e1691670329249.jpe
         .proposal-icon {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-right: 16px;
             flex-shrink: 0;
+            border: 1px solid #d4d4d4;  
         }
 
         .proposal-icon svg {

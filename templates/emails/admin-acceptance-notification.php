@@ -309,7 +309,7 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                     </div>
 
                     <!-- Body Content -->
-                    <div class="body-content" style="padding: 30px;">
+                    <div class="body-content" style="padding: 30px; text-align: left;">
 
                         <!-- Success Alert -->
                         <div class="card response-alert" style="background: #d1fae55c; border-radius: 8px; border: 1px solid #92ffc7; margin-bottom: 30px; padding: 20px;">
