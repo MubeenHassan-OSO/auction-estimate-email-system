@@ -181,4 +181,55 @@ class AEES_Proposal_Email_Manager
 
         wp_mail($admin_email, $subject, $email_body, $headers);
     }
+
+    /**
+     * Send authorization confirmation email to user
+     * Called when auction house authorizes an accepted proposal
+     *
+     * @param int $entry_id The entry ID
+     * @param array $proposal The proposal data
+     * @param array $form_data Form submission data
+     */
+    public function send_user_authorization_confirmation($entry_id, $proposal, $form_data)
+    {
+        $user_email = $form_data['user_email'] ?? '';
+
+        // Don't send if no user email
+        if (empty($user_email)) {
+            return false;
+        }
+
+        $site_name = get_bloginfo('name');
+        $site_logo = get_custom_logo();
+
+        // If custom logo exists, extract URL
+        $logo_url = '';
+        if (!empty($site_logo)) {
+            preg_match('/src="([^"]+)"/', $site_logo, $matches);
+            $logo_url = $matches[1] ?? '';
+        }
+
+        // Fallback to site icon if no logo
+        if (empty($logo_url) && has_site_icon()) {
+            $logo_url = get_site_icon_url(200);
+        }
+
+        // Load HTML email template
+        ob_start();
+        include AEES_PLUGIN_DIR . 'templates/emails/user-authorization-confirmation.php';
+        $email_body = ob_get_clean();
+
+        // Email headers
+        $headers = [
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+        ];
+
+        $subject = 'Your Order Has Been Confirmed!';
+
+        // Send email
+        $sent = wp_mail($user_email, $subject, $email_body, $headers);
+
+        return $sent;
+    }
 }

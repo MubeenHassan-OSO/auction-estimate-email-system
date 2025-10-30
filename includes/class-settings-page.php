@@ -49,6 +49,9 @@ class AEES_Settings_Page
             return;
         }
 
+        // Enqueue WordPress media uploader
+        wp_enqueue_media();
+
         wp_enqueue_script(
             'aees-settings-script',
             AEES_PLUGIN_URL . 'assets/js/settings-page.js',
@@ -74,6 +77,13 @@ class AEES_Settings_Page
             'aees_settings_group',
             'aees_auction_houses',
             [$this, 'sanitize_auction_houses']
+        );
+
+        // Register service providers option separately
+        register_setting(
+            'aees_settings_group',
+            'aees_service_providers',
+            [$this, 'sanitize_service_providers']
         );
 
         // General Settings Section - Hidden for now
@@ -118,6 +128,23 @@ class AEES_Settings_Page
         //     'aees-settings',
         //     'aees_email_section'
         // );
+
+        // Service Providers Section
+        add_settings_section(
+            'aees_service_providers_section',
+            'Service Providers',
+            [$this, 'render_service_providers_section'],
+            'aees-settings'
+        );
+
+        // Service Providers Field
+        add_settings_field(
+            'service_providers',
+            'Manage Service Providers',
+            [$this, 'render_service_providers_field'],
+            'aees-settings',
+            'aees_service_providers_section'
+        );
 
         // Auction Houses Section
         add_settings_section(
@@ -215,6 +242,104 @@ class AEES_Settings_Page
               min="1"
               max="90" /> days';
         echo '<p class="description">How many days auction houses have to authorize accepted proposals. Default: 14 days</p>';
+    }
+
+    /**
+     * Render service providers section description
+     */
+    public function render_service_providers_section()
+    {
+        echo '<p>Manage the list of service providers available for selection in proposals. Each provider can have a name and an icon/image.</p>';
+    }
+
+    /**
+     * Render service providers repeater field
+     */
+    public function render_service_providers_field()
+    {
+        $service_providers = get_option('aees_service_providers', []);
+
+        // Ensure it's an array
+        if (!is_array($service_providers)) {
+            $service_providers = [];
+        }
+
+        ?>
+        <div id="aees-service-providers-repeater">
+            <table class="widefat" style="max-width: 900px;">
+                <thead>
+                    <tr>
+                        <th style="width: 35%;">Provider Name</th>
+                        <th style="width: 50%;">Icon/Image</th>
+                        <th style="width: 15%; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="aees-service-providers-list">
+                    <?php if (empty($service_providers)): ?>
+                        <tr class="aees-no-providers-row">
+                            <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
+                                No service providers added yet. Click "Add Service Provider" below to get started.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($service_providers as $index => $provider): ?>
+                            <tr class="aees-service-provider-row aees-saved-row">
+                                <td>
+                                    <input type="text"
+                                           name="aees_service_providers[<?php echo $index; ?>][name]"
+                                           value="<?php echo esc_attr($provider['name']); ?>"
+                                           class="regular-text aees-provider-name"
+                                           placeholder="e.g., Standard Shipping"
+                                           readonly
+                                           style="background-color: #f0f0f1; cursor: not-allowed;"
+                                           required />
+                                </td>
+                                <td>
+                                    <div class="aees-provider-image-wrapper" style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="hidden"
+                                               name="aees_service_providers[<?php echo $index; ?>][image]"
+                                               value="<?php echo esc_attr($provider['image'] ?? ''); ?>"
+                                               class="aees-provider-image-url" />
+                                        <div class="aees-provider-image-preview" style="flex-shrink: 0;">
+                                            <?php if (!empty($provider['image'])): ?>
+                                                <img src="<?php echo esc_url($provider['image']); ?>"
+                                                     alt="Provider Icon"
+                                                     style="max-width: 60px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;" />
+                                            <?php else: ?>
+                                                <div style="width: 60px; height: 60px; border: 2px dashed #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 11px;">No Image</div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <button type="button" class="button aees-upload-provider-image" data-readonly="true" style="pointer-events: none; opacity: 0.6;">
+                                            <span class="dashicons dashicons-format-image"></span> <?php echo !empty($provider['image']) ? 'Change' : 'Upload'; ?>
+                                        </button>
+                                        <?php if (!empty($provider['image'])): ?>
+                                            <button type="button" class="button aees-remove-provider-image" data-readonly="true" style="pointer-events: none; opacity: 0.6;">
+                                                <span class="dashicons dashicons-no-alt"></span>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="button aees-remove-provider" title="Remove">
+                                        <span class="dashicons dashicons-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 15px;">
+                <button type="button" id="aees-add-service-provider" class="button button-secondary">
+                    <span class="dashicons dashicons-plus-alt" style="margin-top: 3px;"></span> Add Service Provider
+                </button>
+            </p>
+            <p class="description">
+                Add service providers that will appear in the dropdown when creating proposals. The image is optional but recommended for better visual presentation.
+            </p>
+        </div>
+        <?php
     }
 
     /**
@@ -322,6 +447,44 @@ class AEES_Settings_Page
         if (isset($input['authorization_expiration_days'])) {
             $days = absint($input['authorization_expiration_days']);
             $sanitized['authorization_expiration_days'] = max(1, min(90, $days)); // Between 1-90 days
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize service providers before saving
+     */
+    public function sanitize_service_providers($input)
+    {
+        $sanitized = [];
+
+        if (!is_array($input)) {
+            return $sanitized;
+        }
+
+        foreach ($input as $provider) {
+            // Skip if name is empty
+            if (empty($provider['name'])) {
+                continue;
+            }
+
+            // Sanitize name
+            $name = sanitize_text_field($provider['name']);
+
+            // Sanitize image URL (optional)
+            $image = '';
+            if (!empty($provider['image'])) {
+                $image = esc_url_raw($provider['image']);
+            }
+
+            // Add to sanitized array
+            if (!empty($name)) {
+                $sanitized[] = [
+                    'name' => $name,
+                    'image' => $image
+                ];
+            }
         }
 
         return $sanitized;
@@ -438,6 +601,23 @@ class AEES_Settings_Page
         }
 
         return $days;
+    }
+
+    /**
+     * Get saved service providers
+     *
+     * @return array Array of service providers with name and image
+     */
+    public static function get_service_providers()
+    {
+        $service_providers = get_option('aees_service_providers', []);
+
+        // Ensure it's an array
+        if (!is_array($service_providers)) {
+            $service_providers = [];
+        }
+
+        return $service_providers;
     }
 
     /**

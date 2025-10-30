@@ -332,5 +332,8 @@ class AEES_Proposal_Response_Handler
 
         // Send final confirmation email to admin
         $this->email_manager->send_admin_authorization_complete($entry_id, $proposal, $form_data, $auction_email);
+
+        // Send confirmation email to user
+        $this->email_manager->send_user_authorization_confirmation($entry_id, $proposal, $form_data);
     }
 }

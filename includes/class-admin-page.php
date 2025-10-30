@@ -49,10 +49,10 @@ class AEES_Admin_Page
         $table = new AEES_Submission_Table();
         $table->prepare_items();
 
-        echo '<form method="get">';
-        echo '<input type="hidden" name="page" value="aees" />';
+        // echo '<form method="get">';
+        // echo '<input type="hidden" name="page" value="aees" />';
         $table->display();
-        echo '</form>';
-        echo '</div>';
+        // echo '</form>';
+        // echo '</div>';
     }
 }

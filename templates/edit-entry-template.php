@@ -530,9 +530,20 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
             <label>Select Auction House <span style="color: #dc3545; font-weight: 700;">*</span></label>
             <?php
             $auction_houses = AEES_Settings_Page::get_auction_houses();
+            $service_providers = AEES_Settings_Page::get_service_providers();
             $current_auction_email = $auction_email; // Keep for backward compatibility
+
+            // Determine if dropdown should be disabled
+            // Check if entry has been saved (auction email is set)
+            $has_saved_data = !empty($auction_email);
+            $is_email_sent = isset($email_status['is_sent']) && $email_status['is_sent'] && !$email_status['is_expired'];
+            $is_readonly = isset($rejection_history) && !empty($rejection_history);
+            $should_disable = $has_saved_data || $is_email_sent || $entry_status === 'closed' || $is_readonly;
+
+            $disabled_attr = $should_disable ? 'disabled' : '';
+            $disabled_style = $should_disable ? 'background: #F3F4F6; cursor: not-allowed;' : '';
             ?>
-            <select id="aees-auction-house-select" required style="width: 100%; max-width: 400px; height: 44px; border-radius: 8px; margin-bottom: 10px; padding: 7px 15px;">
+            <select id="aees-auction-house-select" required <?php echo $disabled_attr; ?> style="width: 100%; max-width: 400px; height: 44px; border-radius: 8px; margin-bottom: 10px; padding: 7px 15px; <?php echo $disabled_style; ?>">
                 <option value="">-- Select Auction House --</option>
                 <?php foreach ($auction_houses as $index => $house): ?>
                     <option value="<?php echo esc_attr($index); ?>"
@@ -568,28 +579,24 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
 
                         <div class="aees-proposal-body">
                             <div class="aees-field-group">
-                                <label>Proposal Title</label>
-                                <input type="text" name="proposals[<?php echo $i; ?>][title]" value="<?php echo esc_attr($p['title']); ?>" readonly placeholder="e.g., Standard Shipping & Appraisal" maxlength="200" />
-                            </div>
-
-                            <div class="aees-field-group">
-                                <label>Icon/Image <span style="color: #999; font-weight: normal;">(Optional)</span></label>
-                                <div class="aees-image-upload-wrapper">
-                                    <input type="hidden" name="proposals[<?php echo $i; ?>][image]" class="aees-proposal-image" value="<?php echo esc_attr($p['image'] ?? ''); ?>" />
-                                    <div class="aees-image-preview">
-                                        <?php if (!empty($p['image'])): ?>
-                                            <img src="<?php echo esc_url($p['image']); ?>" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />
-                                        <?php endif; ?>
-                                    </div>
-                                    <button type="button" class="button aees-upload-image-btn" data-readonly="true">
-                                        <span class="dashicons dashicons-format-image"></span> <?php echo !empty($p['image']) ? 'Change Image' : 'Upload Image'; ?>
-                                    </button>
-                                    <?php if (!empty($p['image'])): ?>
-                                        <button type="button" class="button aees-remove-image-btn" data-readonly="true" style="margin-left: 8px;">
-                                            <span class="dashicons dashicons-no-alt"></span> Remove
-                                        </button>
-                                    <?php endif; ?>
-                                </div>
+                                <label>Service Provider <span style="color: #dc3545; font-weight: 700;">*</span></label>
+                                <select name="proposals[<?php echo $i; ?>][service_provider]" class="aees-service-provider-select" disabled style="width: 100%; height: 44px; border-radius: 8px; padding: 7px 15px; background-color: #f0f0f1; cursor: not-allowed;">
+                                    <option value="">-- Select Service Provider --</option>
+                                    <?php foreach ($service_providers as $sp_index => $provider): ?>
+                                        <option value="<?php echo esc_attr($sp_index); ?>"
+                                                data-name="<?php echo esc_attr($provider['name']); ?>"
+                                                data-image="<?php echo esc_attr($provider['image'] ?? ''); ?>"
+                                                <?php selected($sp_index, ($p['service_provider'] ?? '')); ?>>
+                                            <?php echo esc_html($provider['name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <?php if (empty($service_providers)): ?>
+                                    <p class="description" style="color: #dc3545; margin-top: 8px; font-size: 12px;">
+                                        <strong>No service providers configured.</strong> Please add service providers in
+                                        <a href="<?php echo admin_url('admin.php?page=aees-settings'); ?>">Settings</a> first.
+                                    </p>
+                                <?php endif; ?>
                             </div>
 
                             <div class="aees-field-group">

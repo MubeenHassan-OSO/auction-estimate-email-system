@@ -57,10 +57,10 @@ jQuery(document).ready(function ($) {
     function updateButtonStates() {
         const proposals = container.find(".aees-proposal-card");
         const filledProposals = proposals.filter(function () {
-            const title = $(this).find("input[name*='[title]']").val()?.trim();
+            const serviceProvider = $(this).find("select[name*='[service_provider]']").val()?.trim();
             const price = $(this).find("input[name*='[price]']").val()?.trim();
             const details = $(this).find("textarea[name*='[details]']").val()?.trim();
-            return title && price && details;
+            return serviceProvider && price && details;
         });
 
         // Check if user has responded (entry is in readonly mode)
@@ -123,14 +123,33 @@ jQuery(document).ready(function ($) {
     }
 
     // create proposal DOM block
-    function buildProposalHTML(index, uid = '', title = '', price = '', details = '', locked = false, saved = false, image = '') {
+    function buildProposalHTML(index, uid = '', serviceProvider = '', price = '', details = '', locked = false, saved = false) {
         const lockedAttr = locked ? 'locked' : '';
         const readonlyAttr = locked ? 'readonly' : '';
-        const readonlyDataAttr = locked ? 'data-readonly="true"' : 'data-readonly="false"';
+        const disabledAttr = locked ? 'disabled' : '';
         const dataSaved = saved ? ' data-saved="true"' : '';
         const dataLocked = locked ? ' data-locked="true"' : ' data-locked="false"';
         const editorId = 'aees-details-' + index;
-        const hasImage = image && image.trim() !== '';
+        const serviceProviders = aeesData.service_providers || [];
+
+        // Build service provider options
+        let providerOptions = '<option value="">-- Select Service Provider --</option>';
+        serviceProviders.forEach((provider, idx) => {
+            const selected = idx == serviceProvider ? 'selected' : '';
+            const providerName = escapeHtml(provider.name || '');
+            const providerImage = escapeHtml(provider.image || '');
+            providerOptions += `<option value="${idx}" data-name="${providerName}" data-image="${providerImage}" ${selected}>${providerName}</option>`;
+        });
+
+        const selectStyle = locked
+            ? 'width: 100%; height: 44px; border-radius: 8px; padding: 7px 15px; background-color: #f0f0f1; cursor: not-allowed;'
+            : 'width: 100%; height: 44px; border-radius: 8px; padding: 7px 15px;';
+
+        const noProvidersWarning = serviceProviders.length === 0
+            ? `<p class="description" style="color: #dc3545; margin-top: 8px; font-size: 12px;">
+                <strong>No service providers configured.</strong> Please add service providers in Settings first.
+               </p>`
+            : '';
 
         return `
             <div class="aees-proposal-card ${lockedAttr}" ${dataLocked} ${dataSaved} data-uid="${uid}">
@@ -143,21 +162,11 @@ jQuery(document).ready(function ($) {
                 </div>
                 <div class="aees-proposal-body">
                     <div class="aees-field-group">
-                        <label>Proposal Title</label>
-                        <input type="text" name="proposals[${index}][title]" value="${escapeHtml(title)}" ${readonlyAttr} placeholder="e.g., Standard Shipping & Appraisal" maxlength="200" />
-                    </div>
-                    <div class="aees-field-group">
-                        <label>Icon/Image <span style="color: #999; font-weight: normal;">(Optional)</span></label>
-                        <div class="aees-image-upload-wrapper">
-                            <input type="hidden" name="proposals[${index}][image]" class="aees-proposal-image" value="${escapeHtml(image)}" />
-                            <div class="aees-image-preview">
-                                ${hasImage ? `<img src="${escapeHtml(image)}" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />` : ''}
-                            </div>
-                            <button type="button" class="button aees-upload-image-btn" ${readonlyDataAttr}>
-                                <span class="dashicons dashicons-format-image"></span> ${hasImage ? 'Change Image' : 'Upload Image'}
-                            </button>
-                            ${hasImage ? `<button type="button" class="button aees-remove-image-btn" ${readonlyDataAttr} style="margin-left: 8px;"><span class="dashicons dashicons-no-alt"></span> Remove</button>` : ''}
-                        </div>
+                        <label>Service Provider <span style="color: #dc3545; font-weight: 700;">*</span></label>
+                        <select name="proposals[${index}][service_provider]" class="aees-service-provider-select" ${disabledAttr} style="${selectStyle}">
+                            ${providerOptions}
+                        </select>
+                        ${noProvidersWarning}
                     </div>
                     <div class="aees-field-group">
                         <label>Price</label>
@@ -217,6 +226,23 @@ jQuery(document).ready(function ($) {
         // Ensure all proposals are locked
         container.find(".aees-proposal-card").addClass("locked").attr("data-locked", "true");
         container.find(".aees-proposal-card input, .aees-proposal-card textarea").prop("readonly", true).css("pointer-events", "none");
+        container.find(".aees-proposal-card select.aees-service-provider-select").prop("disabled", true).css({
+            "background-color": "#f0f0f1",
+            "cursor": "not-allowed"
+        });
+    }
+
+    // Check if there are saved proposals (on page load)
+    const hasSavedProposals = container.find('[data-saved="true"]').length > 0;
+    const auctionEmailValue = auctionEmailInput.val();
+
+    // Lock dropdown if there are saved proposals OR if auction email is already set
+    if ((hasSavedProposals || auctionEmailValue) && !isReadOnly && !isClosed) {
+        // Lock auction house dropdown if there are saved proposals
+        auctionHouseSelect.prop("disabled", true).css({
+            "background": "#F3F4F6",
+            "cursor": "not-allowed"
+        });
     }
 
     // Check if email is sent and not expired - disable editing capabilities
@@ -301,6 +327,10 @@ jQuery(document).ready(function ($) {
             card.attr("data-locked", "false");
             card.find("input").prop("readonly", false).css("pointer-events", "auto");
             card.find("textarea").prop("readonly", false);
+            card.find("select.aees-service-provider-select").prop("disabled", false).css({
+                "background-color": "#ffffff",
+                "cursor": "pointer"
+            });
             $(this).text("💾 Save");
 
             if (editorId) {
@@ -314,6 +344,10 @@ jQuery(document).ready(function ($) {
             card.attr("data-locked", "true");
             card.find("input").prop("readonly", true).css("pointer-events", "none");
             card.find("textarea").prop("readonly", true);
+            card.find("select.aees-service-provider-select").prop("disabled", true).css({
+                "background-color": "#f0f0f1",
+                "cursor": "not-allowed"
+            });
             $(this).text("✏️ Edit");
 
             if (editorId) {
@@ -332,6 +366,11 @@ jQuery(document).ready(function ($) {
 
     // When any input changes, mark unsaved
     container.on("input", "input, textarea", function () {
+        setUnsaved(true);
+    });
+
+    // When service provider dropdown changes, mark unsaved
+    container.on("change", "select.aees-service-provider-select", function () {
         setUnsaved(true);
     });
 
@@ -362,7 +401,7 @@ jQuery(document).ready(function ($) {
         container.find(".aees-proposal-card").each(function () {
             const $c = $(this);
             const uid = $c.data('uid') || $c.find("input[type='hidden']").val() || '';
-            const title = $c.find("input[name*='[title]']").val() || '';
+            const serviceProvider = $c.find("select[name*='[service_provider]']").val() || '';
             const price = $c.find("input[name*='[price]']").val() || '';
 
             // Get details from editor or textarea
@@ -377,9 +416,8 @@ jQuery(document).ready(function ($) {
             }
 
             details = $c.find("textarea[name*='[details]']").val() || '';
-            const image = $c.find(".aees-proposal-image").val() || '';
 
-            arr.push({ uid: uid, title: title, price: price, details: details, image: image });
+            arr.push({ uid: uid, service_provider: serviceProvider, price: price, details: details });
         });
         return arr;
     }
@@ -417,7 +455,7 @@ jQuery(document).ready(function ($) {
         let emptyProposalCount = 0;
 
         proposals.forEach((p, index) => {
-            const hasAnyContent = (p.title && p.title.trim()) ||
+            const hasAnyContent = (p.service_provider && p.service_provider.trim()) ||
                                   (p.price && p.price.trim()) ||
                                   (p.details && p.details.trim());
 
@@ -428,12 +466,9 @@ jQuery(document).ready(function ($) {
             }
 
             // Validate proposals that have some content
-            if (!p.title || p.title.trim() === '') {
+            if (!p.service_provider || p.service_provider.trim() === '') {
                 hasError = true;
-                errorMessage = `Proposal #${index + 1}: Title is required`;
-            } else if (p.title.length > 200) {
-                hasError = true;
-                errorMessage = `Proposal #${index + 1}: Title must not exceed 200 characters`;
+                errorMessage = `Proposal #${index + 1}: Service provider is required`;
             } else if (!p.price || p.price.trim() === '') {
                 hasError = true;
                 errorMessage = `Proposal #${index + 1}: Price is required`;
@@ -489,12 +524,12 @@ jQuery(document).ready(function ($) {
                     // First, remove completely empty proposal cards from DOM
                     container.find(".aees-proposal-card").each(function () {
                         const $c = $(this);
-                        const title = $c.find("input[name*='[title]']").val()?.trim() || '';
+                        const serviceProvider = $c.find("select[name*='[service_provider]']").val()?.trim() || '';
                         const price = $c.find("input[name*='[price]']").val()?.trim() || '';
                         const details = $c.find("textarea[name*='[details]']").val()?.trim() || '';
 
                         // If completely empty, remove from DOM
-                        if (!title && !price && !details) {
+                        if (!serviceProvider && !price && !details) {
                             const editorId = $c.find('.aees-wysiwyg-wrapper').data('editor-id');
                             if (editorId && typeof tinymce !== 'undefined') {
                                 const editor = tinymce.get(editorId);
@@ -524,6 +559,10 @@ jQuery(document).ready(function ($) {
                         $c.attr("data-locked", "true");
                         $c.addClass("locked");
                         $c.find("input, textarea").prop("readonly", true).css("pointer-events", "none");
+                        $c.find("select.aees-service-provider-select").prop("disabled", true).css({
+                            "background-color": "#f0f0f1",
+                            "cursor": "not-allowed"
+                        });
                         $c.data('uid', uid);
                         $c.find(".aees-edit-proposal").text("✏️ Edit");
                         $c.find("input[type='hidden']").val(uid);
@@ -533,6 +572,12 @@ jQuery(document).ready(function ($) {
                     });
 
                     setUnsaved(false);
+
+                    // Lock auction house dropdown after save
+                    auctionHouseSelect.prop("disabled", true).css({
+                        "background": "#F3F4F6",
+                        "cursor": "not-allowed"
+                    });
 
                     // enable email button if at least one saved proposal exists
                     const savedCount = container.find('[data-saved="true"]').length;
@@ -845,101 +890,4 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // WordPress Media Uploader for Proposal Images
-    let mediaUploader;
-
-    container.on("click", ".aees-upload-image-btn", function (e) {
-        e.preventDefault();
-
-        const $button = $(this);
-        const $wrapper = $button.closest(".aees-image-upload-wrapper");
-        const $imageInput = $wrapper.find(".aees-proposal-image");
-        const $imagePreview = $wrapper.find(".aees-image-preview");
-        const isReadonly = $button.attr("data-readonly") === "true";
-
-        // Don't allow upload if readonly (locked proposal)
-        if (isReadonly) {
-            return;
-        }
-
-        // If the uploader object has already been created, reopen the dialog
-        if (mediaUploader) {
-            mediaUploader.open();
-            return;
-        }
-
-        // Create the media uploader
-        mediaUploader = wp.media({
-            title: 'Choose Proposal Icon/Image',
-            button: {
-                text: 'Use this image'
-            },
-            multiple: false,
-            library: {
-                type: 'image'
-            }
-        });
-
-        // When an image is selected, run a callback
-        mediaUploader.on('select', function () {
-            const attachment = mediaUploader.state().get('selection').first().toJSON();
-            const imageUrl = attachment.url;
-
-            // Update the hidden input
-            $imageInput.val(imageUrl);
-
-            // Update the preview
-            $imagePreview.html(`<img src="${imageUrl}" alt="Proposal Icon" style="max-width: 80px; max-height: 80px; display: block; margin-bottom: 8px;" />`);
-
-            // Update button text
-            $button.html('<span class="dashicons dashicons-format-image"></span> Change Image');
-
-            // Add remove button if it doesn't exist
-            if ($wrapper.find(".aees-remove-image-btn").length === 0) {
-                $button.after(`
-                    <button type="button" class="button aees-remove-image-btn" data-readonly="false" style="margin-left: 8px;">
-                        <span class="dashicons dashicons-no-alt"></span> Remove
-                    </button>
-                `);
-            }
-
-            // Mark as unsaved
-            setUnsaved(true);
-        });
-
-        // Open the uploader dialog
-        mediaUploader.open();
-    });
-
-    // Remove proposal image
-    container.on("click", ".aees-remove-image-btn", function (e) {
-        e.preventDefault();
-
-        const $button = $(this);
-        const $wrapper = $button.closest(".aees-image-upload-wrapper");
-        const $imageInput = $wrapper.find(".aees-proposal-image");
-        const $imagePreview = $wrapper.find(".aees-image-preview");
-        const $uploadBtn = $wrapper.find(".aees-upload-image-btn");
-        const isReadonly = $button.attr("data-readonly") === "true";
-
-        // Don't allow removal if readonly (locked proposal)
-        if (isReadonly) {
-            return;
-        }
-
-        // Clear the hidden input
-        $imageInput.val('');
-
-        // Clear the preview
-        $imagePreview.empty();
-
-        // Update upload button text
-        $uploadBtn.html('<span class="dashicons dashicons-format-image"></span> Upload Image');
-
-        // Remove the remove button
-        $button.remove();
-
-        // Mark as unsaved
-        setUnsaved(true);
-    });
 });

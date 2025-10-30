@@ -255,8 +255,7 @@ class AEES_Submission_Table extends WP_List_Table
                 $entry_status_html = '<span class="aees-entry-status-open">🔓 Open</span>';
             }
 
-            // Format date only (no time) using WordPress date format setting
-            // Forminator stores dates in local WordPress time (not GMT)
+
             $timestamp = mysql2date('U', $row->$date_column, true);
             $date_formatted = wp_date(
                 get_option('date_format'),
