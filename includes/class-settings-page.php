@@ -113,6 +113,7 @@ class AEES_Settings_Page
 
         // // User Response Expiration
         // add_settings_field(
+
         //     'user_response_expiration_days',
         //     'User Response Expiration (days)',
         //     [$this, 'render_user_expiration_field'],
@@ -269,8 +270,8 @@ class AEES_Settings_Page
             <table class="widefat" style="max-width: 900px;">
                 <thead>
                     <tr>
-                        <th style="width: 35%;">Provider Name</th>
-                        <th style="width: 50%;">Icon/Image</th>
+                        <th style="width: 50%;">Provider Name</th>
+                        <th style="width: 35%;">Icon/Image</th>
                         <th style="width: 15%; text-align: center;">Action</th>
                     </tr>
                 </thead>
@@ -364,12 +365,12 @@ class AEES_Settings_Page
 
         ?>
         <div id="aees-auction-houses-repeater">
-            <table class="widefat" style="max-width: 800px;">
+            <table class="widefat" style="max-width: 900px;">
                 <thead>
                     <tr>
-                        <th style="width: 40%;">Auction House Name</th>
-                        <th style="width: 50%;">Email Address</th>
-                        <th style="width: 10%; text-align: center;">Action</th>
+                        <th style="width: 45%;">Auction House Name</th>
+                        <th style="width: 40%;">Email Address</th>
+                        <th style="width: 15%; text-align: center;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="aees-auction-houses-list">
@@ -538,7 +539,7 @@ class AEES_Settings_Page
 
             <?php settings_errors(); ?>
 
-            <form method="post" action="options.php">
+            <form class="service-providers-form" method="post" action="options.php">
                 <?php
                 settings_fields('aees_settings_group');
                 do_settings_sections('aees-settings');
