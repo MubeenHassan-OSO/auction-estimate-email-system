@@ -534,11 +534,9 @@ $readonly_class = $user_has_responded ? 'aees-entry-readonly' : '';
             $current_auction_email = $auction_email; // Keep for backward compatibility
 
             // Determine if dropdown should be disabled
-            // Check if entry has been saved (auction email is set)
-            $has_saved_data = !empty($auction_email);
-            $is_email_sent = isset($email_status['is_sent']) && $email_status['is_sent'] && !$email_status['is_expired'];
-            $is_readonly = isset($rejection_history) && !empty($rejection_history);
-            $should_disable = $has_saved_data || $is_email_sent || $entry_status === 'closed' || $is_readonly;
+            // Only disable if email has been sent to user OR entry is closed
+            $is_email_sent = isset($email_status['is_sent']) && $email_status['is_sent'];
+            $should_disable = $is_email_sent || $entry_status === 'closed';
 
             $disabled_attr = $should_disable ? 'disabled' : '';
             $disabled_style = $should_disable ? 'background: #F3F4F6; cursor: not-allowed;' : '';

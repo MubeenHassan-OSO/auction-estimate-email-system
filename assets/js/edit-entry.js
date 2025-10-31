@@ -232,18 +232,9 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    // Check if there are saved proposals (on page load)
-    const hasSavedProposals = container.find('[data-saved="true"]').length > 0;
-    const auctionEmailValue = auctionEmailInput.val();
-
-    // Lock dropdown if there are saved proposals OR if auction email is already set
-    if ((hasSavedProposals || auctionEmailValue) && !isReadOnly && !isClosed) {
-        // Lock auction house dropdown if there are saved proposals
-        auctionHouseSelect.prop("disabled", true).css({
-            "background": "#F3F4F6",
-            "cursor": "not-allowed"
-        });
-    }
+    // NOTE: Auction house dropdown locking is now controlled by email sent status only
+    // This allows admin to change auction house before sending email, even if entry is saved
+    // The locking logic is handled in the email sent check below (lines 248-266)
 
     // Check if email is sent and not expired - disable editing capabilities
     const emailStatus = aeesData.email_status;
@@ -298,7 +289,10 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         // Calculate the next proposal index based on current number of proposals
         const proposalIndex = container.find(".aees-proposal-card").length;
-        const uid = "p_" + Math.random().toString(36).substring(2, 10);
+        // Generate unique ID with timestamp to ensure uniqueness
+        const timestamp = Date.now().toString(36);
+        const randomPart = Math.random().toString(36).substring(2, 9);
+        const uid = "p_" + timestamp + randomPart;
         const html = buildProposalHTML(proposalIndex, uid, '', '', '', false, false);
         container.append(html);
 
@@ -400,7 +394,8 @@ jQuery(document).ready(function ($) {
         const arr = [];
         container.find(".aees-proposal-card").each(function () {
             const $c = $(this);
-            const uid = $c.data('uid') || $c.find("input[type='hidden']").val() || '';
+            // Get UID from data attribute first, then from hidden input with specific name
+            const uid = $c.data('uid') || $c.find("input[name*='[uid]']").val() || '';
             const serviceProvider = $c.find("select[name*='[service_provider]']").val() || '';
             const price = $c.find("input[name*='[price]']").val() || '';
 
@@ -573,11 +568,9 @@ jQuery(document).ready(function ($) {
 
                     setUnsaved(false);
 
-                    // Lock auction house dropdown after save
-                    auctionHouseSelect.prop("disabled", true).css({
-                        "background": "#F3F4F6",
-                        "cursor": "not-allowed"
-                    });
+                    // NOTE: Removed auto-lock of auction house dropdown after save
+                    // Admin should be able to change auction house until email is sent
+                    // Locking is now only controlled by email sent status
 
                     // enable email button if at least one saved proposal exists
                     const savedCount = container.find('[data-saved="true"]').length;

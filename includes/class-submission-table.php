@@ -22,6 +22,88 @@ class AEES_Submission_Table extends WP_List_Table
         ]);
     }
 
+    /**
+     * Get current filter values from request
+     */
+    private function get_filter_values()
+    {
+        return [
+            'entry_status' => isset($_GET['filter_entry_status']) ? sanitize_text_field($_GET['filter_entry_status']) : '',
+            'user_response' => isset($_GET['filter_user_response']) ? sanitize_text_field($_GET['filter_user_response']) : '',
+            'auction_approval' => isset($_GET['filter_auction_approval']) ? sanitize_text_field($_GET['filter_auction_approval']) : '',
+            'email_search' => isset($_GET['filter_email_search']) ? sanitize_text_field($_GET['filter_email_search']) : ''
+        ];
+    }
+
+    /**
+     * Display filter form above the table
+     */
+    protected function extra_tablenav($which)
+    {
+        if ($which !== 'top') {
+            return;
+        }
+
+        $filters = $this->get_filter_values();
+        ?>
+        <div class="aees-filters-wrapper">
+            <h3>Filters</h3>
+            <form method="get" class="aees-filters-form">
+                <input type="hidden" name="page" value="<?php echo esc_attr($_GET['page'] ?? ''); ?>">
+
+                <div class="aees-filters-row">
+                    <div class="aees-filter-group">
+                        <label for="filter_entry_status">Entry Status</label>
+                        <select name="filter_entry_status" id="filter_entry_status">
+                            <option value="">All Statuses</option>
+                            <option value="open" <?php selected($filters['entry_status'], 'open'); ?>>Open</option>
+                            <option value="closed" <?php selected($filters['entry_status'], 'closed'); ?>>Closed</option>
+                        </select>
+                    </div>
+
+                    <div class="aees-filter-group">
+                        <label for="filter_user_response">User Response</label>
+                        <select name="filter_user_response" id="filter_user_response">
+                            <option value="">All Responses</option>
+                            <option value="no_email" <?php selected($filters['user_response'], 'no_email'); ?>>No Email Sent</option>
+                            <option value="pending" <?php selected($filters['user_response'], 'pending'); ?>>Pending</option>
+                            <option value="accepted" <?php selected($filters['user_response'], 'accepted'); ?>>Accepted</option>
+                            <option value="rejected" <?php selected($filters['user_response'], 'rejected'); ?>>Declined</option>
+                        </select>
+                    </div>
+
+                    <div class="aees-filter-group">
+                        <label for="filter_auction_approval">Auction Approval</label>
+                        <select name="filter_auction_approval" id="filter_auction_approval">
+                            <option value="">All Approvals</option>
+                            <option value="na" <?php selected($filters['auction_approval'], 'na'); ?>>N/A</option>
+                            <option value="pending" <?php selected($filters['auction_approval'], 'pending'); ?>>Pending Authorization</option>
+                            <option value="approved" <?php selected($filters['auction_approval'], 'approved'); ?>>Approved</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="aees-filters-row">
+                    <div class="aees-filter-group aees-filter-search">
+                        <label for="filter_email_search">Search by Email</label>
+                        <input type="text"
+                               name="filter_email_search"
+                               id="filter_email_search"
+                               value="<?php echo esc_attr($filters['email_search']); ?>"
+                               placeholder="Enter email address...">
+                    </div>
+                </div>
+
+                <div class="aees-filters-actions">
+                    <button type="submit" class="button button-primary">Apply Filters</button>
+                    <a href="<?php echo admin_url('admin.php?page=' . esc_attr($_GET['page'] ?? '')); ?>"
+                       class="button">Clear Filters</a>
+                </div>
+            </form>
+        </div>
+        <?php
+    }
+
     public function get_columns()
     {
         return [
@@ -60,14 +142,88 @@ class AEES_Submission_Table extends WP_List_Table
         global $wpdb;
 
         $entry_table = $wpdb->prefix . 'frmt_form_entry';
+        $meta_table  = $wpdb->prefix . 'frmt_form_entry_meta';
+        $proposals_table = $wpdb->prefix . 'aees_proposals';
+        $tokens_table = $wpdb->prefix . 'aees_response_tokens';
+        $tokens_table_exists = ($wpdb->get_var("SHOW TABLES LIKE '{$tokens_table}'") == $tokens_table);
+
+        // Get filter values
+        $filters = $this->get_filter_values();
+
+        // Build filter WHERE clauses (same logic as get_submission_data)
+        $where_clauses = ["e.form_id = %d"];
+        $prepare_values = [$this->form_id];
+        $email_join = false;
+
+        // Filter by Entry Status
+        if (!empty($filters['entry_status'])) {
+            if ($filters['entry_status'] === 'open') {
+                // Open includes NULL (new entries without proposals) and explicitly 'open'
+                $where_clauses[] = "(p.entry_status = %s OR p.entry_status IS NULL)";
+                $prepare_values[] = $filters['entry_status'];
+            } else {
+                // Closed must be explicitly set
+                $where_clauses[] = "p.entry_status = %s";
+                $prepare_values[] = $filters['entry_status'];
+            }
+        }
+
+        // Filter by Email Search
+        if (!empty($filters['email_search'])) {
+            $email_join = true;
+            $where_clauses[] = "m.meta_value LIKE %s";
+            $prepare_values[] = '%' . $wpdb->esc_like($filters['email_search']) . '%';
+        }
+
+        // Filter by User Response
+        if (!empty($filters['user_response']) && $tokens_table_exists) {
+            switch ($filters['user_response']) {
+                case 'no_email':
+                    $where_clauses[] = "(p.email_sent_at IS NULL)";
+                    break;
+                case 'pending':
+                    $where_clauses[] = "(p.email_sent_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status IN ('rejected', 'accepted')))";
+                    break;
+                case 'accepted':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted'))";
+                    break;
+                case 'rejected':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'rejected'))";
+                    break;
+            }
+        }
+
+        // Filter by Auction Approval Status
+        if (!empty($filters['auction_approval']) && $tokens_table_exists) {
+            switch ($filters['auction_approval']) {
+                case 'na':
+                    $where_clauses[] = "(p.email_sent_at IS NULL OR NOT EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted'))";
+                    break;
+                case 'pending':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted' AND t.authorized_at IS NULL))";
+                    break;
+                case 'approved':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.authorized_at IS NOT NULL))";
+                    break;
+            }
+        }
+
+        $where_sql = implode(' AND ', $where_clauses);
+
+        // Build count query
+        $count_query = "SELECT COUNT(DISTINCT e.entry_id)
+                        FROM {$entry_table} e
+                        LEFT JOIN {$proposals_table} p ON e.entry_id = p.entry_id";
+
+        // Add email join if needed
+        if ($email_join) {
+            $count_query .= " LEFT JOIN {$meta_table} m ON e.entry_id = m.entry_id AND m.meta_key LIKE '%email%'";
+        }
+
+        $count_query .= " WHERE {$where_sql}";
 
         $count = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(entry_id)
-                 FROM {$entry_table}
-                 WHERE form_id = %d",
-                $this->form_id
-            )
+            $wpdb->prepare($count_query, $prepare_values)
         );
 
         return (int) $count;
@@ -98,13 +254,77 @@ class AEES_Submission_Table extends WP_List_Table
         $tokens_table = $wpdb->prefix . 'aees_response_tokens';
         $tokens_table_exists = ($wpdb->get_var("SHOW TABLES LIKE '{$tokens_table}'") == $tokens_table);
 
+        // Get filter values
+        $filters = $this->get_filter_values();
+
+        // Build filter WHERE clauses
+        $where_clauses = ["e.form_id = %d"];
+        $prepare_values = [$this->form_id];
+        $email_join = false;
+
+        // Filter by Entry Status
+        if (!empty($filters['entry_status'])) {
+            if ($filters['entry_status'] === 'open') {
+                // Open includes NULL (new entries without proposals) and explicitly 'open'
+                $where_clauses[] = "(p.entry_status = %s OR p.entry_status IS NULL)";
+                $prepare_values[] = $filters['entry_status'];
+            } else {
+                // Closed must be explicitly set
+                $where_clauses[] = "p.entry_status = %s";
+                $prepare_values[] = $filters['entry_status'];
+            }
+        }
+
+        // Filter by Email Search
+        if (!empty($filters['email_search'])) {
+            $email_join = true;
+            $where_clauses[] = "m.meta_value LIKE %s";
+            $prepare_values[] = '%' . $wpdb->esc_like($filters['email_search']) . '%';
+        }
+
+        // Filter by User Response (complex conditions)
+        if (!empty($filters['user_response']) && $tokens_table_exists) {
+            switch ($filters['user_response']) {
+                case 'no_email':
+                    $where_clauses[] = "(p.email_sent_at IS NULL)";
+                    break;
+                case 'pending':
+                    $where_clauses[] = "(p.email_sent_at IS NOT NULL AND NOT EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status IN ('rejected', 'accepted')))";
+                    break;
+                case 'accepted':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted'))";
+                    break;
+                case 'rejected':
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'rejected'))";
+                    break;
+            }
+        }
+
+        // Filter by Auction Approval Status
+        if (!empty($filters['auction_approval']) && $tokens_table_exists) {
+            switch ($filters['auction_approval']) {
+                case 'na':
+                    // N/A: No email sent, pending, or rejected
+                    $where_clauses[] = "(p.email_sent_at IS NULL OR NOT EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted'))";
+                    break;
+                case 'pending':
+                    // Accepted but not authorized
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.status = 'accepted' AND t.authorized_at IS NULL))";
+                    break;
+                case 'approved':
+                    // Authorized
+                    $where_clauses[] = "(EXISTS (SELECT 1 FROM {$tokens_table} t WHERE t.entry_id = e.entry_id AND t.authorized_at IS NOT NULL))";
+                    break;
+            }
+        }
+
+        $where_sql = implode(' AND ', $where_clauses);
+
         // Optimized query with proposals data
         if ($tokens_table_exists) {
             // Use tokens table for fast status lookup (no JSON parsing)
             // Also check if accepted proposals have been authorized
-            $entry_rows = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT DISTINCT
+            $base_query = "SELECT DISTINCT
                         e.entry_id,
                         e.{$date_column},
                         p.proposals,
@@ -121,34 +341,48 @@ class AEES_Submission_Table extends WP_List_Table
                          AND t.authorized_at IS NOT NULL
                          LIMIT 1) as authorized_at
                      FROM {$entry_table} e
-                     LEFT JOIN {$proposals_table} p ON e.entry_id = p.entry_id
-                     WHERE e.form_id = %d
+                     LEFT JOIN {$proposals_table} p ON e.entry_id = p.entry_id";
+
+            // Add email join if needed
+            if ($email_join) {
+                $base_query .= " LEFT JOIN {$meta_table} m ON e.entry_id = m.entry_id AND m.meta_key LIKE '%email%'";
+            }
+
+            $base_query .= " WHERE {$where_sql}
                      ORDER BY e.{$date_column} DESC
-                     LIMIT %d OFFSET %d",
-                    $this->form_id,
-                    $per_page,
-                    $offset
-                )
+                     LIMIT %d OFFSET %d";
+
+            $prepare_values[] = $per_page;
+            $prepare_values[] = $offset;
+
+            $entry_rows = $wpdb->get_results(
+                $wpdb->prepare($base_query, $prepare_values)
             );
         } else {
             // Fallback: Standard query without tokens table
-            $entry_rows = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT
+            $base_query = "SELECT
                         e.entry_id,
                         e.{$date_column},
                         p.proposals,
                         p.email_sent_at,
                         p.entry_status
                      FROM {$entry_table} e
-                     LEFT JOIN {$proposals_table} p ON e.entry_id = p.entry_id
-                     WHERE e.form_id = %d
+                     LEFT JOIN {$proposals_table} p ON e.entry_id = p.entry_id";
+
+            // Add email join if needed
+            if ($email_join) {
+                $base_query .= " LEFT JOIN {$meta_table} m ON e.entry_id = m.entry_id AND m.meta_key LIKE '%email%'";
+            }
+
+            $base_query .= " WHERE {$where_sql}
                      ORDER BY e.{$date_column} DESC
-                     LIMIT %d OFFSET %d",
-                    $this->form_id,
-                    $per_page,
-                    $offset
-                )
+                     LIMIT %d OFFSET %d";
+
+            $prepare_values[] = $per_page;
+            $prepare_values[] = $offset;
+
+            $entry_rows = $wpdb->get_results(
+                $wpdb->prepare($base_query, $prepare_values)
             );
         }
 

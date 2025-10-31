@@ -33,12 +33,13 @@ class AEES_Admin_Page
             return;
         }
 
-        wp_enqueue_style('aees-admin-css', AEES_PLUGIN_URL . 'assets/css/admin.css');
+        wp_enqueue_style('aees-admin-css', AEES_PLUGIN_URL . 'assets/css/admin-style.css');
     }
 
     public function render_page()
     {
-        echo '<div class="wrap"><h1>Auction Estimate Email System</h1>';
+        echo '<div class="wrap">';
+        echo '<h1>Auction Estimate Email System</h1>';
 
         if (!class_exists('AEES_Submission_Table')) {
             echo '<div class="notice notice-error"><p>Submission table class not found.</p></div>';
@@ -49,10 +50,7 @@ class AEES_Admin_Page
         $table = new AEES_Submission_Table();
         $table->prepare_items();
 
-        // echo '<form method="get">';
-        // echo '<input type="hidden" name="page" value="aees" />';
         $table->display();
-        // echo '</form>';
-        // echo '</div>';
+        echo '</div>';
     }
 }

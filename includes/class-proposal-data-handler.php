@@ -51,6 +51,27 @@ class AEES_Proposal_Data_Handler
         global $wpdb;
         $table_name = $wpdb->prefix . 'aees_proposals';
 
+        // Detect and fix duplicate UIDs before saving
+        $uid_map = [];
+        foreach ($proposals as &$proposal) {
+            $uid = $proposal['uid'] ?? '';
+
+            // If this UID has been seen before, generate a new unique one
+            if (isset($uid_map[$uid])) {
+                $new_uid = 'p_' . uniqid() . bin2hex(random_bytes(4));
+                error_log("AEES: Duplicate UID detected: {$uid}. Generating new UID: {$new_uid}");
+                $proposal['uid'] = $new_uid;
+
+                // Regenerate response token with new UID
+                $proposal['response_token'] = hash_hmac('sha256', $new_uid . '_' . $entry_id, wp_salt());
+
+                $uid_map[$new_uid] = true;
+            } else {
+                $uid_map[$uid] = true;
+            }
+        }
+        unset($proposal); // Break reference
+
         $proposals_json = json_encode($proposals);
 
         // Check if entry exists
@@ -530,21 +551,24 @@ class AEES_Proposal_Data_Handler
         global $wpdb;
         $history_table = $wpdb->prefix . 'aees_proposal_history';
 
-        // Check if this proposal already exists in history (avoid duplicates)
+        // Check if this exact proposal response already exists in history (avoid duplicates)
+        // We check entry_id + proposal_uid + status to allow the same proposal
+        // to be saved multiple times if status changes (e.g., reopened and rejected again)
+        $proposal_uid = $proposal['uid'] ?? '';
+        $status = $proposal['status'] ?? 'pending';
+
         $exists = $wpdb->get_var($wpdb->prepare(
             "SELECT id FROM {$history_table}
              WHERE entry_id = %d
              AND proposal_uid = %s
-             AND status = %s
-             AND user_response_date = %s",
+             AND status = %s",
             $entry_id,
-            $proposal['uid'] ?? '',
-            $proposal['status'] ?? 'pending',
-            $proposal['user_response_date'] ?? null
+            $proposal_uid,
+            $status
         ));
 
         if ($exists) {
-            return true; // Already in history, skip
+            return true; // Already in history with same status, skip
         }
 
         // Insert into history

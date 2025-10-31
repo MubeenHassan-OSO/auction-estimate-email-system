@@ -7,6 +7,19 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* Ensure form and table structure don't overlap */
+.wrap form {
+    clear: both;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+/* WordPress list table wrapper */
+form.wp-list-table {
+    display: table !important;
+}
+
 /* Page Header */
 .wrap h1 {
     /* background-color: #db0f31;
@@ -49,6 +62,10 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    clear: both !important;
+    display: table;
+    margin-top: 0 !important;
+    width: 100%;
 }
 
 /* Table Header */
@@ -279,13 +296,215 @@
     cursor: pointer;
 }
 
+/* Filters Wrapper */
+.aees-filters-wrapper {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 0 0 24px 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    clear: both !important;
+    display: block !important;
+    width: 100%;
+    box-sizing: border-box;
+    float: none !important;
+}
+
+.aees-filters-wrapper h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1F2937;
+    letter-spacing: -0.3px;
+}
+
+/* Filter Form */
+.aees-filters-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.aees-filters-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.aees-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.aees-filter-group.aees-filter-search {
+    flex: 2;
+}
+
+.aees-filter-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.aees-filter-group select,
+.aees-filter-group input[type="text"] {
+    padding: 10px 14px;
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1F2937;
+    background: #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+.aees-filter-group select:focus,
+.aees-filter-group input[type="text"]:focus {
+    outline: none;
+    border-color: #000000;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+}
+
+.aees-filter-group select:hover,
+.aees-filter-group input[type="text"]:hover {
+    border-color: #9CA3AF;
+}
+
+/* Filter Actions */
+.aees-filters-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.aees-filters-actions .button-primary {
+    background-color: #000000;
+    border-color: #000000;
+    color: #FFFFFF;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-shadow: none;
+    box-shadow: none;
+    transition: all 0.3s ease;
+}
+
+.aees-filters-actions .button-primary:hover {
+    background-color: #515151;
+    border-color: #515151;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.aees-filters-actions .button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    background: #FFFFFF;
+    border: 2px solid #E5E7EB;
+    color: #374151;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.aees-filters-actions .button:hover {
+    background: #F9FAFB;
+    border-color: #9CA3AF;
+    transform: translateY(-1px);
+}
+
+/* Table Wrapper to Ensure Spacing */
+.wp-list-table-wrapper {
+    clear: both;
+    margin-top: 0;
+}
+
+/* Force proper stacking order for all elements */
+.tablenav.top {
+    position: relative;
+    z-index: 10;
+}
+
+.aees-filters-wrapper {
+    position: relative;
+    z-index: 11;
+}
+
+.wp-list-table {
+    position: relative;
+    z-index: 5;
+}
+
+.tablenav.bottom {
+    position: relative;
+    z-index: 4;
+}
+
+/* Responsive Filters */
+@media (max-width: 782px) {
+    .aees-filters-wrapper {
+        padding: 20px;
+    }
+
+    .aees-filters-row {
+        flex-direction: column;
+    }
+
+    .aees-filter-group {
+        min-width: 100%;
+    }
+
+    .aees-filters-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .aees-filters-actions .button,
+    .aees-filters-actions .button-primary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
 /* Pagination */
 .tablenav {
     background: #F9FAFB;
     padding: 16px 20px;
     border-radius: 12px;
-    margin: 20px 0;
+    margin: 0 0 20px 0;
     border: 1px solid #E5E7EB;
+    clear: both;
+    position: relative;
+}
+
+/* Top tablenav should be invisible - only contains filters */
+.tablenav.top {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Bottom tablenav shows pagination */
+.tablenav.bottom {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* Hide any bulk actions or other elements in top tablenav */
+.tablenav.top .bulkactions,
+.tablenav.top .actions,
+.tablenav.top .alignleft:not(.aees-filters-wrapper),
+.tablenav.top .tablenav-pages {
+    /* display: none !important; */
 }
 
 .tablenav .tablenav-pages {
@@ -330,6 +549,12 @@
     color: #9CA3AF;
     font-size: 16px;
     background: #F9FAFB !important;
+    border: none !important;
+}
+
+.wp-list-table tbody tr.no-items {
+    border: none !important;
+    background: transparent !important;
 }
 
 /* Loading State */
