@@ -482,6 +482,8 @@ form.wp-list-table {
     border: 1px solid #E5E7EB;
     clear: both;
     position: relative;
+    clear: both;
+    position: relative;
 }
 
 /* Top tablenav should be invisible - only contains filters */
@@ -506,6 +508,29 @@ form.wp-list-table {
 .tablenav.top .tablenav-pages {
     /* display: none !important; */
 }
+
+/* Top tablenav should be invisible - only contains filters */
+.tablenav.top {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Bottom tablenav shows pagination */
+.tablenav.bottom {
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+/* Hide any bulk actions or other elements in top tablenav */
+/* .tablenav.top .bulkactions,
+.tablenav.top .actions,
+.tablenav.top .alignleft:not(.aees-filters-wrapper),
+.tablenav.top .tablenav-pages {
+    display: none !important;
+} */
 
 .tablenav .tablenav-pages {
     color: #374151;

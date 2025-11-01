@@ -391,6 +391,5 @@ $user_email = $form_data['user_email'] ?? 'Not available';
             </td>
         </tr>
     </table>
-
 </body>
 </html>
