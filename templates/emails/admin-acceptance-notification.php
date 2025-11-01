@@ -203,6 +203,7 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                 </tr>
                             </table>
 
+<<<<<<< Updated upstream
                             <!-- Action Button -->
                             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                                 <tr>
@@ -213,6 +214,30 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                                     </td>
                                 </tr>
                             </table>
+=======
+                        <!-- Proposal Info Card -->
+                        <div class="card response-accepted-proposal" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #d4d4d4; margin-bottom: 20px; padding: 20px;">
+                            <h3 class="card-title" style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Accepted Proposal
+                            </h3>
+                            <div class="proposal-row" style="display: flex; margin-bottom: 16px; gap: 45px;">
+                                <div class="proposal-label" style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Title:</div>
+                                <div class="proposal-value" style="color: #1F2937; font-size: 16px; font-weight: 600; flex: 1;"><?php echo esc_html($proposal['title']); ?></div>
+                            </div>
+                            <div class="proposal-row" style="display: flex; margin-bottom: 16px; gap: 45px;">
+                                <div class="proposal-label" style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Price:</div>
+                                <div class="proposal-price" style="color: #10B981; font-size: 16px; font-weight: 700; flex: 1;">$<?php echo esc_html(number_format((float)$proposal['price'], 2)); ?></div>
+                            </div>
+                            <?php if (!empty($proposal['details'])): ?>
+                            <div class="proposal-row" style="display: flex; margin-bottom: 16px; gap: 45px;">
+                                <div class="proposal-label" style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Details:</div>
+                                <div class="proposal-details-content" style="color: #4B5563; font-size: 16px; line-height: 1.6; flex: 1;">
+                                    <?php echo wpautop($proposal['details']); ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+>>>>>>> Stashed changes
 
                             <!-- Workflow Status -->
                             <table class="accepted-proposal-next" width="100%" cellpadding="0" cellspacing="0">

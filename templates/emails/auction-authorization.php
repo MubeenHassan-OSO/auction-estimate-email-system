@@ -204,7 +204,7 @@ $logo_url = get_theme_mod('custom_logo') ? wp_get_attachment_image_url(get_theme
             }
 
             .btn-authorize {
-                display: block;
+                display: inline;
                 width: 100%;
             }
 
