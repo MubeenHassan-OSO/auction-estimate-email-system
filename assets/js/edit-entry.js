@@ -3,8 +3,27 @@ jQuery(document).ready(function ($) {
     const saveBtn = $("#aees-save-entry");
     const emailBtn = $("#aees-send-email");
     const addBtn = $("#aees-add-proposal");
+    const auctionHouseSelect = $("#aees-auction-house-select");
+    const auctionNameInput = $("#aees-auction-name");
     const auctionEmailInput = $("#aees-auction-email");
     let unsavedChanges = false;
+
+    // Handle auction house dropdown selection
+    auctionHouseSelect.on("change", function () {
+        const selectedOption = $(this).find("option:selected");
+        const auctionName = selectedOption.data("name") || "";
+        const auctionEmail = selectedOption.data("email") || "";
+
+        // Update hidden fields
+        auctionNameInput.val(auctionName);
+        auctionEmailInput.val(auctionEmail);
+
+        // Remove error styling if present
+        $(this).css("border-color", "");
+
+        // Mark as unsaved
+        setUnsaved(true);
+    });
 
     // helpers
     function setUnsaved(flag) {
@@ -38,10 +57,10 @@ jQuery(document).ready(function ($) {
     function updateButtonStates() {
         const proposals = container.find(".aees-proposal-card");
         const filledProposals = proposals.filter(function () {
-            const title = $(this).find("input[name*='[title]']").val()?.trim();
+            const serviceProvider = $(this).find("select[name*='[service_provider]']").val()?.trim();
             const price = $(this).find("input[name*='[price]']").val()?.trim();
             const details = $(this).find("textarea[name*='[details]']").val()?.trim();
-            return title && price && details;
+            return serviceProvider && price && details;
         });
 
         // Check if user has responded (entry is in readonly mode)
@@ -104,12 +123,33 @@ jQuery(document).ready(function ($) {
     }
 
     // create proposal DOM block
-    function buildProposalHTML(index, uid = '', title = '', price = '', details = '', locked = false, saved = false) {
+    function buildProposalHTML(index, uid = '', serviceProvider = '', price = '', details = '', locked = false, saved = false) {
         const lockedAttr = locked ? 'locked' : '';
         const readonlyAttr = locked ? 'readonly' : '';
+        const disabledAttr = locked ? 'disabled' : '';
         const dataSaved = saved ? ' data-saved="true"' : '';
         const dataLocked = locked ? ' data-locked="true"' : ' data-locked="false"';
         const editorId = 'aees-details-' + index;
+        const serviceProviders = aeesData.service_providers || [];
+
+        // Build service provider options
+        let providerOptions = '<option value="">-- Select Service Provider --</option>';
+        serviceProviders.forEach((provider, idx) => {
+            const selected = idx == serviceProvider ? 'selected' : '';
+            const providerName = escapeHtml(provider.name || '');
+            const providerImage = escapeHtml(provider.image || '');
+            providerOptions += `<option value="${idx}" data-name="${providerName}" data-image="${providerImage}" ${selected}>${providerName}</option>`;
+        });
+
+        const selectStyle = locked
+            ? 'width: 100%; height: 44px; border-radius: 8px; padding: 7px 15px; background-color: #f0f0f1; cursor: not-allowed;'
+            : 'width: 100%; height: 44px; border-radius: 8px; padding: 7px 15px;';
+
+        const noProvidersWarning = serviceProviders.length === 0
+            ? `<p class="description" style="color: #dc3545; margin-top: 8px; font-size: 12px;">
+                <strong>No service providers configured.</strong> Please add service providers in Settings first.
+               </p>`
+            : '';
 
         return `
             <div class="aees-proposal-card ${lockedAttr}" ${dataLocked} ${dataSaved} data-uid="${uid}">
@@ -122,8 +162,11 @@ jQuery(document).ready(function ($) {
                 </div>
                 <div class="aees-proposal-body">
                     <div class="aees-field-group">
-                        <label>Proposal Title</label>
-                        <input type="text" name="proposals[${index}][title]" value="${escapeHtml(title)}" ${readonlyAttr} placeholder="e.g., Standard Shipping & Appraisal" maxlength="200" />
+                        <label>Service Provider <span style="color: #dc3545; font-weight: 700;">*</span></label>
+                        <select name="proposals[${index}][service_provider]" class="aees-service-provider-select" ${disabledAttr} style="${selectStyle}">
+                            ${providerOptions}
+                        </select>
+                        ${noProvidersWarning}
                     </div>
                     <div class="aees-field-group">
                         <label>Price</label>
@@ -174,8 +217,8 @@ jQuery(document).ready(function ($) {
             "pointer-events": "none"
         });
 
-        // Lock auction email input
-        auctionEmailInput.prop("readonly", true).css({
+        // Lock auction house dropdown
+        auctionHouseSelect.prop("disabled", true).css({
             "background": "#F3F4F6",
             "cursor": "not-allowed"
         });
@@ -183,7 +226,15 @@ jQuery(document).ready(function ($) {
         // Ensure all proposals are locked
         container.find(".aees-proposal-card").addClass("locked").attr("data-locked", "true");
         container.find(".aees-proposal-card input, .aees-proposal-card textarea").prop("readonly", true).css("pointer-events", "none");
+        container.find(".aees-proposal-card select.aees-service-provider-select").prop("disabled", true).css({
+            "background-color": "#f0f0f1",
+            "cursor": "not-allowed"
+        });
     }
+
+    // NOTE: Auction house dropdown locking is now controlled by email sent status only
+    // This allows admin to change auction house before sending email, even if entry is saved
+    // The locking logic is handled in the email sent check below (lines 248-266)
 
     // Check if email is sent and not expired - disable editing capabilities
     const emailStatus = aeesData.email_status;
@@ -199,7 +250,7 @@ jQuery(document).ready(function ($) {
             "pointer-events": "none"
         });
 
-        auctionEmailInput.prop("readonly", true).css({
+        auctionHouseSelect.prop("disabled", true).css({
             "background": "#F3F4F6",
             "cursor": "not-allowed"
         });
@@ -238,7 +289,10 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         // Calculate the next proposal index based on current number of proposals
         const proposalIndex = container.find(".aees-proposal-card").length;
-        const uid = "p_" + Math.random().toString(36).substring(2, 10);
+        // Generate unique ID with timestamp to ensure uniqueness
+        const timestamp = Date.now().toString(36);
+        const randomPart = Math.random().toString(36).substring(2, 9);
+        const uid = "p_" + timestamp + randomPart;
         const html = buildProposalHTML(proposalIndex, uid, '', '', '', false, false);
         container.append(html);
 
@@ -267,6 +321,10 @@ jQuery(document).ready(function ($) {
             card.attr("data-locked", "false");
             card.find("input").prop("readonly", false).css("pointer-events", "auto");
             card.find("textarea").prop("readonly", false);
+            card.find("select.aees-service-provider-select").prop("disabled", false).css({
+                "background-color": "#ffffff",
+                "cursor": "pointer"
+            });
             $(this).text("💾 Save");
 
             if (editorId) {
@@ -280,6 +338,10 @@ jQuery(document).ready(function ($) {
             card.attr("data-locked", "true");
             card.find("input").prop("readonly", true).css("pointer-events", "none");
             card.find("textarea").prop("readonly", true);
+            card.find("select.aees-service-provider-select").prop("disabled", true).css({
+                "background-color": "#f0f0f1",
+                "cursor": "not-allowed"
+            });
             $(this).text("✏️ Edit");
 
             if (editorId) {
@@ -301,6 +363,11 @@ jQuery(document).ready(function ($) {
         setUnsaved(true);
     });
 
+    // When service provider dropdown changes, mark unsaved
+    container.on("change", "select.aees-service-provider-select", function () {
+        setUnsaved(true);
+    });
+
     // Real-time price input validation - only allow numbers and one decimal point
     container.on("input", ".aees-price-input", function () {
         let value = $(this).val();
@@ -319,40 +386,17 @@ jQuery(document).ready(function ($) {
         setUnsaved(true);
     });
 
-    // Auction email validation on input and blur
-    auctionEmailInput.on("input", function () {
-        const email = $(this).val().trim();
-        // Remove red border when user starts typing
-        if (email) {
-            $(this).css("border-color", "");
-        }
-        setUnsaved(true);
-    });
-
-    auctionEmailInput.on("blur", function () {
-        const email = $(this).val().trim();
-        if (!email) {
-            // Empty field - required
-            $(this).css("border-color", "#dc3545");
-            $(this).attr("title", "This field is required");
-        } else if (!isValidEmail(email)) {
-            // Invalid email format
-            $(this).css("border-color", "#dc3545");
-            $(this).attr("title", "Please enter a valid email address");
-        } else {
-            // Valid email
-            $(this).css("border-color", "#10B981");
-            $(this).attr("title", "");
-        }
-    });
+    // Removed: Old auction email input validation handlers
+    // Now using dropdown selection instead
 
     // Collect proposals from DOM (order may not matter)
     function collectProposals() {
         const arr = [];
         container.find(".aees-proposal-card").each(function () {
             const $c = $(this);
-            const uid = $c.data('uid') || $c.find("input[type='hidden']").val() || '';
-            const title = $c.find("input[name*='[title]']").val() || '';
+            // Get UID from data attribute first, then from hidden input with specific name
+            const uid = $c.data('uid') || $c.find("input[name*='[uid]']").val() || '';
+            const serviceProvider = $c.find("select[name*='[service_provider]']").val() || '';
             const price = $c.find("input[name*='[price]']").val() || '';
 
             // Get details from editor or textarea
@@ -368,7 +412,7 @@ jQuery(document).ready(function ($) {
 
             details = $c.find("textarea[name*='[details]']").val() || '';
 
-            arr.push({ uid: uid, title: title, price: price, details: details });
+            arr.push({ uid: uid, service_provider: serviceProvider, price: price, details: details });
         });
         return arr;
     }
@@ -381,29 +425,20 @@ jQuery(document).ready(function ($) {
         const proposals = collectProposals();
         const auctionEmail = auctionEmailInput.val().trim();
 
-        // Validate auction email is required
+        // Validate auction house is selected
         if (!auctionEmail || auctionEmail === '') {
             Swal.fire({
                 icon: 'error',
                 title: 'Required Field',
-                text: 'Auction House Email is required. Please enter a valid email address.',
+                text: 'Please select an auction house from the dropdown.',
                 confirmButtonColor: '#2271b1'
             });
-            auctionEmailInput.focus().css("border-color", "#dc3545");
+            auctionHouseSelect.focus().css("border-color", "#dc3545");
             return;
         }
 
-        // Validate auction email format
-        if (!isValidEmail(auctionEmail)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Invalid Email',
-                text: 'Please enter a valid email address for the auction house.',
-                confirmButtonColor: '#2271b1'
-            });
-            auctionEmailInput.focus().css("border-color", "#dc3545");
-            return;
-        }
+        // Email validation is handled by dropdown selection (already validated in settings)
+        // No need for additional email format validation here
 
         // Check if there are any proposal cards on the page
         const proposalCardsCount = container.find(".aees-proposal-card").length;
@@ -415,7 +450,7 @@ jQuery(document).ready(function ($) {
         let emptyProposalCount = 0;
 
         proposals.forEach((p, index) => {
-            const hasAnyContent = (p.title && p.title.trim()) ||
+            const hasAnyContent = (p.service_provider && p.service_provider.trim()) ||
                                   (p.price && p.price.trim()) ||
                                   (p.details && p.details.trim());
 
@@ -426,12 +461,9 @@ jQuery(document).ready(function ($) {
             }
 
             // Validate proposals that have some content
-            if (!p.title || p.title.trim() === '') {
+            if (!p.service_provider || p.service_provider.trim() === '') {
                 hasError = true;
-                errorMessage = `Proposal #${index + 1}: Title is required`;
-            } else if (p.title.length > 200) {
-                hasError = true;
-                errorMessage = `Proposal #${index + 1}: Title must not exceed 200 characters`;
+                errorMessage = `Proposal #${index + 1}: Service provider is required`;
             } else if (!p.price || p.price.trim() === '') {
                 hasError = true;
                 errorMessage = `Proposal #${index + 1}: Price is required`;
@@ -487,12 +519,12 @@ jQuery(document).ready(function ($) {
                     // First, remove completely empty proposal cards from DOM
                     container.find(".aees-proposal-card").each(function () {
                         const $c = $(this);
-                        const title = $c.find("input[name*='[title]']").val()?.trim() || '';
+                        const serviceProvider = $c.find("select[name*='[service_provider]']").val()?.trim() || '';
                         const price = $c.find("input[name*='[price]']").val()?.trim() || '';
                         const details = $c.find("textarea[name*='[details]']").val()?.trim() || '';
 
                         // If completely empty, remove from DOM
-                        if (!title && !price && !details) {
+                        if (!serviceProvider && !price && !details) {
                             const editorId = $c.find('.aees-wysiwyg-wrapper').data('editor-id');
                             if (editorId && typeof tinymce !== 'undefined') {
                                 const editor = tinymce.get(editorId);
@@ -522,6 +554,10 @@ jQuery(document).ready(function ($) {
                         $c.attr("data-locked", "true");
                         $c.addClass("locked");
                         $c.find("input, textarea").prop("readonly", true).css("pointer-events", "none");
+                        $c.find("select.aees-service-provider-select").prop("disabled", true).css({
+                            "background-color": "#f0f0f1",
+                            "cursor": "not-allowed"
+                        });
                         $c.data('uid', uid);
                         $c.find(".aees-edit-proposal").text("✏️ Edit");
                         $c.find("input[type='hidden']").val(uid);
@@ -531,6 +567,10 @@ jQuery(document).ready(function ($) {
                     });
 
                     setUnsaved(false);
+
+                    // NOTE: Removed auto-lock of auction house dropdown after save
+                    // Admin should be able to change auction house until email is sent
+                    // Locking is now only controlled by email sent status
 
                     // enable email button if at least one saved proposal exists
                     const savedCount = container.find('[data-saved="true"]').length;
@@ -842,4 +882,5 @@ jQuery(document).ready(function ($) {
             icon.text("−");
         }
     });
+
 });

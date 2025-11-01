@@ -19,9 +19,9 @@ class AEES_Settings_Page
      */
     public function __construct()
     {
-        // Temporarily commented out - settings page hidden from menu
-        // add_action('admin_menu', [$this, 'register_settings_submenu'], 15);
+        add_action('admin_menu', [$this, 'register_settings_submenu'], 15);
         add_action('admin_init', [$this, 'register_settings']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_settings_scripts']);
     }
 
     /**
@@ -40,6 +40,28 @@ class AEES_Settings_Page
     }
 
     /**
+     * Enqueue scripts for settings page
+     */
+    public function enqueue_settings_scripts($hook)
+    {
+        // Only load on our settings page
+        if ($hook !== 'auction-estimate-emails_page_aees-settings') {
+            return;
+        }
+
+        // Enqueue WordPress media uploader
+        wp_enqueue_media();
+
+        wp_enqueue_script(
+            'aees-settings-script',
+            AEES_PLUGIN_URL . 'assets/js/settings-page.js',
+            ['jquery'],
+            AEES_VERSION,
+            true
+        );
+    }
+
+    /**
      * Register plugin settings
      */
     public function register_settings()
@@ -50,47 +72,96 @@ class AEES_Settings_Page
             [$this, 'sanitize_settings'] // Sanitization callback
         );
 
-        // General Settings Section
+        // Register auction houses option separately
+        register_setting(
+            'aees_settings_group',
+            'aees_auction_houses',
+            [$this, 'sanitize_auction_houses']
+        );
+
+        // Register service providers option separately
+        register_setting(
+            'aees_settings_group',
+            'aees_service_providers',
+            [$this, 'sanitize_service_providers']
+        );
+
+        // General Settings Section - Hidden for now
+        // add_settings_section(
+        //     'aees_general_section',
+        //     'General Settings',
+        //     [$this, 'render_general_section'],
+        //     'aees-settings'
+        // );
+
+        // // Form ID Setting
+        // add_settings_field(
+        //     'forminator_form_id',
+        //     'Forminator Form ID',
+        //     [$this, 'render_form_id_field'],
+        //     'aees-settings',
+        //     'aees_general_section'
+        // );
+
+        // Email Expiration Settings Section - Hidden for now
+        // add_settings_section(
+        //     'aees_email_section',
+        //     'Email Expiration Settings',
+        //     [$this, 'render_email_section'],
+        //     'aees-settings'
+        // );
+
+        // // User Response Expiration
+        // add_settings_field(
+
+        //     'user_response_expiration_days',
+        //     'User Response Expiration (days)',
+        //     [$this, 'render_user_expiration_field'],
+        //     'aees-settings',
+        //     'aees_email_section'
+        // );
+
+        // // Authorization Expiration
+        // add_settings_field(
+        //     'authorization_expiration_days',
+        //     'Authorization Expiration (days)',
+        //     [$this, 'render_authorization_expiration_field'],
+        //     'aees-settings',
+        //     'aees_email_section'
+        // );
+
+        // Service Providers Section
         add_settings_section(
-            'aees_general_section',
-            'General Settings',
-            [$this, 'render_general_section'],
+            'aees_service_providers_section',
+            'Service Providers',
+            [$this, 'render_service_providers_section'],
             'aees-settings'
         );
 
-        // Form ID Setting
+        // Service Providers Field
         add_settings_field(
-            'forminator_form_id',
-            'Forminator Form ID',
-            [$this, 'render_form_id_field'],
+            'service_providers',
+            'Manage Service Providers',
+            [$this, 'render_service_providers_field'],
             'aees-settings',
-            'aees_general_section'
+            'aees_service_providers_section'
         );
 
-        // Email Expiration Settings Section
+        // Auction Houses Section
         add_settings_section(
-            'aees_email_section',
-            'Email Expiration Settings',
-            [$this, 'render_email_section'],
+            'aees_auction_houses_section',
+            'Auction Houses',
+            [$this, 'render_auction_houses_section'],
             'aees-settings'
         );
 
-        // User Response Expiration
+        // Auction Houses Field
         add_settings_field(
-            'user_response_expiration_days',
-            'User Response Expiration (days)',
-            [$this, 'render_user_expiration_field'],
+            'auction_houses',
+            'Manage Auction Houses',
+            [$this, 'render_auction_houses_field'],
             'aees-settings',
-            'aees_email_section'
-        );
-
-        // Authorization Expiration
-        add_settings_field(
-            'authorization_expiration_days',
-            'Authorization Expiration (days)',
-            [$this, 'render_authorization_expiration_field'],
-            'aees-settings',
-            'aees_email_section'
+            'aees_auction_houses_section'
         );
     }
 
@@ -175,6 +246,187 @@ class AEES_Settings_Page
     }
 
     /**
+     * Render service providers section description
+     */
+    public function render_service_providers_section()
+    {
+        echo '<p>Manage the list of service providers available for selection in proposals. Each provider can have a name and an icon/image.</p>';
+    }
+
+    /**
+     * Render service providers repeater field
+     */
+    public function render_service_providers_field()
+    {
+        $service_providers = get_option('aees_service_providers', []);
+
+        // Ensure it's an array
+        if (!is_array($service_providers)) {
+            $service_providers = [];
+        }
+
+        ?>
+        <div id="aees-service-providers-repeater">
+            <table class="widefat" style="max-width: 900px;">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Provider Name</th>
+                        <th style="width: 35%;">Icon/Image</th>
+                        <th style="width: 15%; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="aees-service-providers-list">
+                    <?php if (empty($service_providers)): ?>
+                        <tr class="aees-no-providers-row">
+                            <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
+                                No service providers added yet. Click "Add Service Provider" below to get started.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($service_providers as $index => $provider): ?>
+                            <tr class="aees-service-provider-row aees-saved-row">
+                                <td>
+                                    <input type="text"
+                                           name="aees_service_providers[<?php echo $index; ?>][name]"
+                                           value="<?php echo esc_attr($provider['name']); ?>"
+                                           class="regular-text aees-provider-name"
+                                           placeholder="e.g., Standard Shipping"
+                                           readonly
+                                           style="background-color: #f0f0f1; cursor: not-allowed;"
+                                           required />
+                                </td>
+                                <td>
+                                    <div class="aees-provider-image-wrapper" style="display: flex; align-items: center; gap: 10px;">
+                                        <input type="hidden"
+                                               name="aees_service_providers[<?php echo $index; ?>][image]"
+                                               value="<?php echo esc_attr($provider['image'] ?? ''); ?>"
+                                               class="aees-provider-image-url" />
+                                        <div class="aees-provider-image-preview" style="flex-shrink: 0;">
+                                            <?php if (!empty($provider['image'])): ?>
+                                                <img src="<?php echo esc_url($provider['image']); ?>"
+                                                     alt="Provider Icon"
+                                                     style="max-width: 60px; max-height: 60px; border: 1px solid #ddd; border-radius: 4px; display: block;" />
+                                            <?php else: ?>
+                                                <div style="width: 60px; height: 60px; border: 2px dashed #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 11px;">No Image</div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <button type="button" class="button aees-upload-provider-image" data-readonly="true" style="pointer-events: none; opacity: 0.6;">
+                                            <span class="dashicons dashicons-format-image"></span> <?php echo !empty($provider['image']) ? 'Change' : 'Upload'; ?>
+                                        </button>
+                                        <?php if (!empty($provider['image'])): ?>
+                                            <button type="button" class="button aees-remove-provider-image" data-readonly="true" style="pointer-events: none; opacity: 0.6;">
+                                                <span class="dashicons dashicons-no-alt"></span>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="button aees-remove-provider" title="Remove">
+                                        <span class="dashicons dashicons-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 15px;">
+                <button type="button" id="aees-add-service-provider" class="button button-secondary">
+                    <span class="dashicons dashicons-plus-alt" style="margin-top: 3px;"></span> Add Service Provider
+                </button>
+            </p>
+            <p class="description">
+                Add service providers that will appear in the dropdown when creating proposals. The image is optional but recommended for better visual presentation.
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render auction houses section description
+     */
+    public function render_auction_houses_section()
+    {
+        echo '<p>Manage the list of auction houses available for selection when creating proposals.</p>';
+    }
+
+    /**
+     * Render auction houses repeater field
+     */
+    public function render_auction_houses_field()
+    {
+        $auction_houses = get_option('aees_auction_houses', []);
+
+        // Ensure it's an array
+        if (!is_array($auction_houses)) {
+            $auction_houses = [];
+        }
+
+        ?>
+        <div id="aees-auction-houses-repeater">
+            <table class="widefat" style="max-width: 900px;">
+                <thead>
+                    <tr>
+                        <th style="width: 45%;">Auction House Name</th>
+                        <th style="width: 40%;">Email Address</th>
+                        <th style="width: 15%; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="aees-auction-houses-list">
+                    <?php if (empty($auction_houses)): ?>
+                        <tr class="aees-no-houses-row">
+                            <td colspan="3" style="text-align: center; padding: 20px; color: #999;">
+                                No auction houses added yet. Click "Add Auction House" below to get started.
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach ($auction_houses as $index => $house): ?>
+                            <tr class="aees-auction-house-row aees-saved-row">
+                                <td>
+                                    <input type="text"
+                                           name="aees_auction_houses[<?php echo $index; ?>][name]"
+                                           value="<?php echo esc_attr($house['name']); ?>"
+                                           class="regular-text aees-house-name"
+                                           placeholder="e.g., Christie's"
+                                           readonly
+                                           style="background-color: #f0f0f1; cursor: not-allowed;"
+                                           required />
+                                </td>
+                                <td>
+                                    <input type="email"
+                                           name="aees_auction_houses[<?php echo $index; ?>][email]"
+                                           value="<?php echo esc_attr($house['email']); ?>"
+                                           class="regular-text aees-house-email"
+                                           placeholder="e.g., shipping@christies.com"
+                                           readonly
+                                           style="background-color: #f0f0f1; cursor: not-allowed;"
+                                           required />
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="button aees-remove-house" title="Remove">
+                                        <span class="dashicons dashicons-trash"></span>
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+
+            <p style="margin-top: 15px;">
+                <button type="button" id="aees-add-auction-house" class="button button-secondary">
+                    <span class="dashicons dashicons-plus-alt" style="margin-top: 3px;"></span> Add Auction House
+                </button>
+            </p>
+            <p class="description">
+                Add auction houses that will appear in the dropdown when creating proposals.
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
      * Sanitize settings before saving
      */
     public function sanitize_settings($input)
@@ -202,6 +454,77 @@ class AEES_Settings_Page
     }
 
     /**
+     * Sanitize service providers before saving
+     */
+    public function sanitize_service_providers($input)
+    {
+        $sanitized = [];
+
+        if (!is_array($input)) {
+            return $sanitized;
+        }
+
+        foreach ($input as $provider) {
+            // Skip if name is empty
+            if (empty($provider['name'])) {
+                continue;
+            }
+
+            // Sanitize name
+            $name = sanitize_text_field($provider['name']);
+
+            // Sanitize image URL (optional)
+            $image = '';
+            if (!empty($provider['image'])) {
+                $image = esc_url_raw($provider['image']);
+            }
+
+            // Add to sanitized array
+            if (!empty($name)) {
+                $sanitized[] = [
+                    'name' => $name,
+                    'image' => $image
+                ];
+            }
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * Sanitize auction houses before saving
+     */
+    public function sanitize_auction_houses($input)
+    {
+        $sanitized = [];
+
+        if (!is_array($input)) {
+            return $sanitized;
+        }
+
+        foreach ($input as $house) {
+            // Skip if either name or email is empty
+            if (empty($house['name']) || empty($house['email'])) {
+                continue;
+            }
+
+            // Sanitize and validate
+            $name = sanitize_text_field($house['name']);
+            $email = sanitize_email($house['email']);
+
+            // Only add if email is valid
+            if (!empty($name) && is_email($email)) {
+                $sanitized[] = [
+                    'name' => $name,
+                    'email' => $email
+                ];
+            }
+        }
+
+        return $sanitized;
+    }
+
+    /**
      * Render settings page
      */
     public function render_settings_page()
@@ -216,70 +539,13 @@ class AEES_Settings_Page
 
             <?php settings_errors(); ?>
 
-            <form method="post" action="options.php">
+            <form class="service-providers-form" method="post" action="options.php">
                 <?php
                 settings_fields('aees_settings_group');
                 do_settings_sections('aees-settings');
                 submit_button('Save Settings');
                 ?>
             </form>
-
-            <hr>
-
-            <h2>System Information</h2>
-            <table class="form-table">
-                <tr>
-                    <th scope="row">Plugin Version</th>
-                    <td><?php echo esc_html(AEES_VERSION); ?></td>
-                </tr>
-                <tr>
-                    <th scope="row">Database Version</th>
-                    <td><?php echo esc_html(get_option('aees_db_version', '1.0')); ?></td>
-                </tr>
-                <tr>
-                    <th scope="row">Forminator Status</th>
-                    <td>
-                        <?php if (class_exists('Forminator_API')): ?>
-                            <span style="color: #46b450;">
-                                <span class="dashicons dashicons-yes-alt"></span> Active
-                            </span>
-                        <?php else: ?>
-                            <span style="color: #dc3232;">
-                                <span class="dashicons dashicons-warning"></span> Not Active (Required)
-                            </span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">Response Page</th>
-                    <td>
-                        <?php
-                        $page = get_page_by_path('proposal-response');
-                        if ($page): ?>
-                            <span style="color: #46b450;">
-                                <span class="dashicons dashicons-yes-alt"></span> Created
-                            </span>
-                            <a href="<?php echo get_permalink($page->ID); ?>" target="_blank">View Page</a>
-                        <?php else: ?>
-                            <span style="color: #dc3232;">
-                                <span class="dashicons dashicons-warning"></span> Missing
-                            </span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            </table>
-
-            <hr>
-
-            <h2>Need Help?</h2>
-            <p>
-                For documentation, troubleshooting, and support:
-                <ul>
-                    <li>Check the <strong>README.md</strong> file in the plugin directory</li>
-                    <li>Review the <strong>CHANGELOG.md</strong> for recent updates</li>
-                    <li>Contact: Mubeen Hassan</li>
-                </ul>
-            </p>
         </div>
         <?php
     }
@@ -336,5 +602,39 @@ class AEES_Settings_Page
         }
 
         return $days;
+    }
+
+    /**
+     * Get saved service providers
+     *
+     * @return array Array of service providers with name and image
+     */
+    public static function get_service_providers()
+    {
+        $service_providers = get_option('aees_service_providers', []);
+
+        // Ensure it's an array
+        if (!is_array($service_providers)) {
+            $service_providers = [];
+        }
+
+        return $service_providers;
+    }
+
+    /**
+     * Get saved auction houses
+     *
+     * @return array Array of auction houses with name and email
+     */
+    public static function get_auction_houses()
+    {
+        $auction_houses = get_option('aees_auction_houses', []);
+
+        // Ensure it's an array
+        if (!is_array($auction_houses)) {
+            $auction_houses = [];
+        }
+
+        return $auction_houses;
     }
 }

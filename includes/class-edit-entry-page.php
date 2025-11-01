@@ -77,7 +77,7 @@ class AEES_Edit_Entry_Page
             'aees-admin-edit-js',
             AEES_PLUGIN_URL . 'assets/js/edit-entry.js',
             ['jquery', 'wp-editor'],
-            AEES_VERSION . '.3', // Cache buster - increment when JS changes
+            AEES_VERSION . '.4', // Cache buster - increment when JS changes
             true
         );
 
@@ -114,13 +114,17 @@ class AEES_Edit_Entry_Page
         $entry_status = $current_entry_id ? $this->data_handler->get_entry_status($current_entry_id) : 'open';
         $has_authorized = $current_entry_id ? $this->data_handler->has_authorized_proposals($current_entry_id) : false;
 
+        // Get service providers for dropdown
+        $service_providers = AEES_Settings_Page::get_service_providers();
+
         wp_localize_script('aees-admin-edit-js', 'aeesData', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => $nonce,
             'entry_id' => $current_entry_id,
             'email_status' => $email_status, // Pass email status to JavaScript
             'entry_status' => $entry_status,  // Pass entry status to JavaScript
-            'has_authorized_proposals' => $has_authorized // Pass authorization flag
+            'has_authorized_proposals' => $has_authorized, // Pass authorization flag
+            'service_providers' => $service_providers // Pass service providers for dropdown
         ]);
     }
 
@@ -185,23 +189,31 @@ class AEES_Edit_Entry_Page
         $proposals_in = isset($_POST['proposals']) && is_array($_POST['proposals']) ? $_POST['proposals'] : [];
         $proposals = [];
 
+        // Get service providers for validation and data retrieval
+        $service_providers = AEES_Settings_Page::get_service_providers();
+
         foreach ($proposals_in as $p) {
             $uid = isset($p['uid']) ? sanitize_text_field($p['uid']) : uniqid('p_');
-            $title = isset($p['title']) ? sanitize_text_field($p['title']) : '';
+            $service_provider_index = isset($p['service_provider']) ? intval($p['service_provider']) : '';
             $price = isset($p['price']) ? sanitize_text_field($p['price']) : '';
             $details = isset($p['details']) ? wp_kses_post($p['details']) : '';
 
+            // Get provider name and image from the service providers array
+            $provider_name = '';
+            $provider_image = '';
+            if ($service_provider_index !== '' && isset($service_providers[$service_provider_index])) {
+                $provider_name = $service_providers[$service_provider_index]['name'];
+                $provider_image = $service_providers[$service_provider_index]['image'] ?? '';
+            }
+
             // Skip completely empty proposals
-            if ($title === '' && $price === '' && $details === '') {
+            if ($service_provider_index === '' && $price === '' && $details === '') {
                 continue;
             }
 
             // Validate proposal fields
-            if (empty($title)) {
-                wp_send_json_error(['message' => 'Proposal title is required'], 400);
-            }
-            if (strlen($title) > 200) {
-                wp_send_json_error(['message' => 'Proposal title must not exceed 200 characters'], 400);
+            if ($service_provider_index === '') {
+                wp_send_json_error(['message' => 'Service provider is required for each proposal'], 400);
             }
             if (empty($price)) {
                 wp_send_json_error(['message' => 'Proposal price is required'], 400);
@@ -219,9 +231,11 @@ class AEES_Edit_Entry_Page
 
             $proposals[] = [
                 'uid' => $uid,
-                'title' => $title,
+                'service_provider' => $service_provider_index,
+                'title' => $provider_name, // Store provider name as title for backward compatibility
                 'price' => $price,
                 'details' => $details,
+                'image' => $provider_image, // Store provider image
                 'status' => $existing_status,
                 'user_response_date' => $existing_response_date,
                 'response_token' => $response_token,

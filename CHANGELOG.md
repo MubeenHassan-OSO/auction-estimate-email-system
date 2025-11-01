@@ -7,6 +7,121 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.8.0] - 2025-01-30
+
+### Added
+- **Auction House Dropdown System** - Centralized auction house management
+  - New Settings page section for managing auction houses
+  - Repeater fields for Auction House Name + Email
+  - Dropdown selector in edit entry page (replaces manual email input)
+  - Saved auction houses are readonly (can only be deleted)
+  - New option in wp_options: `aees_auction_houses`
+  - Helper method: `AEES_Settings_Page::get_auction_houses()`
+  - New JavaScript file: `assets/js/settings-page.js`
+  - Prevents email typos and ensures data consistency
+  - Better UX with faster workflow
+
+- **Proposal Image Upload Feature** - Custom icons for proposals
+  - WordPress Media Library integration for image selection
+  - Optional image/icon field for each proposal
+  - Image preview (80x80px) in edit interface
+  - Upload, Change, and Remove image buttons
+  - Images display in customer proposal emails
+  - Falls back to default SVG icon if no image uploaded
+  - Images stored as URLs in proposal data
+  - Respects locked/readonly proposal state
+  - Sanitized with `esc_url_raw()` for security
+
+- **Responsive Email Templates** - Hybrid table/div approach
+  - Converted `auction-authorization.php` to responsive layout
+  - Converted `admin-authorization-complete.php` to responsive layout
+  - Added main wrapper table to `user-proposals.php` for email client compatibility
+  - Mobile-friendly flexbox layouts with fallbacks
+  - Stacks content vertically on small screens (<600px)
+  - Better rendering across Gmail, Outlook, Apple Mail, Yahoo
+
+- **Filtered Auction Authorization Email** - Only show essential data
+  - From "Other Info" group: Insured Value, Customs Value, Contact Email, Invoice attachments
+  - From "Seller" group: First row only
+  - From "Ship To" group: All fields if present
+  - Cleaner, more focused authorization emails
+  - Reduces information overload for auction houses
+
+### Changed
+- **Settings Page Simplified** - Focused interface
+  - Hidden General Settings section (form ID still works via code)
+  - Hidden Email Expiration Settings section (still functional)
+  - Removed System Information section
+  - Removed Help section
+  - Only displays Auction Houses management
+  - Cleaner, purpose-focused admin experience
+
+- **Edit Entry Interface** - Improved proposal management
+  - Auction house email replaced with dropdown selector
+  - Warning message if no auction houses configured (with link to settings)
+  - Image upload field added between Title and Price fields
+  - Upload button opens WordPress Media Library
+  - Image preview updates in real-time
+  - Remove button appears when image exists
+
+- **Database Storage** - Enhanced proposal data structure
+  - Proposal array now includes `image` field
+  - Image URLs stored as part of proposal JSON
+  - No schema changes required (existing structure supports it)
+
+### Fixed
+- **Image Not Saving** - PHP handler was missing image processing
+  - Added image field sanitization in `class-edit-entry-page.php`
+  - Images now properly saved and retrieved from database
+  - Image data persists across page reloads
+
+### UI/UX Improvements
+- Auction house selection with clear visual feedback
+- Saved auction houses show gray background (readonly state)
+- Better delete confirmation for saved auction houses
+- Image upload button shows dashicon for visual clarity
+- Image preview helps verify selection before saving
+- Responsive email layouts improve mobile readability
+- Cleaner settings page reduces admin confusion
+
+### Security
+- Auction house emails validated in settings (not per-entry)
+- Image URLs sanitized with `esc_url_raw()`
+- Email validation moved to centralized settings
+- Proper escaping in email templates for custom images
+
+### Technical Details
+- New files:
+  - `assets/js/settings-page.js` - Auction house repeater functionality
+- Updated files:
+  - `includes/class-settings-page.php` - Auction house management
+  - `includes/class-edit-entry-page.php` - Image field handling
+  - `templates/edit-entry-template.php` - Dropdown and image upload UI
+  - `templates/emails/auction-authorization.php` - Responsive layout + data filtering
+  - `templates/emails/admin-authorization-complete.php` - Responsive layout
+  - `templates/emails/user-proposals.php` - Table wrapper + custom images
+  - `assets/js/edit-entry.js` - WordPress Media Uploader integration
+- WordPress Media Library already enqueued (`wp_enqueue_media()`)
+- Image handling respects proposal locked/readonly state
+- Auction house data stored separately from main settings
+
+### Developer Notes
+- New method: `AEES_Settings_Page::get_auction_houses()` - Returns array of auction houses
+- New method: `AEES_Settings_Page::sanitize_auction_houses()` - Validates and sanitizes auction house data
+- Image field added to proposal save/retrieve logic in `ajax_save_entry()`
+- JavaScript `buildProposalHTML()` function updated with image parameter
+- JavaScript `collectProposals()` function updated to include image data
+- Media uploader checks `data-readonly` attribute to prevent uploads on locked proposals
+- Email templates use conditional logic to show custom image or default SVG
+
+### Performance
+- No performance impact from auction house dropdown (minimal data)
+- Image URLs stored as text (no file storage overhead)
+- Settings page JavaScript only loads on settings page
+- No additional database queries (uses existing proposal structure)
+
+---
+
 ## [1.7.1] - 2025-01-28
 
 ### Fixed
@@ -419,6 +534,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Major Features |
 |---------|--------------|----------------|
+| 1.8.0 | 2025-01-30 | Auction house dropdown system, proposal image upload, responsive email templates, filtered authorization data |
+| 1.7.1 | 2025-01-28 | Email formatting fixes, line break rendering, security improvements |
 | 1.7.0 | 2025-01-27 | Proposal history table, entry status column, improved messaging, permanent data preservation |
 | 1.6.0 | TBD | Settings page, configurable form ID, comprehensive documentation |
 | 1.5.0 | 2024 | Response tracking UI, expiration tracking |
@@ -431,6 +548,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## Upgrade Notes
+
+### Upgrading to 1.8.0
+
+1. **Configure Auction Houses (Required)**
+   - After upgrade, visit **Auction Estimate Emails → Settings**
+   - Add your auction houses (Name + Email)
+   - Click "Save Settings"
+   - Without auction houses configured, you cannot create new proposals
+
+2. **Existing Entries Compatible**
+   - Existing entries with auction house emails will auto-select matching dropdown option
+   - If email doesn't match any saved auction house, dropdown shows blank (add it to settings)
+   - No data loss - all existing proposals remain intact
+
+3. **Image Upload Optional**
+   - Proposal image/icon is optional
+   - Existing proposals without images show default SVG icon
+   - You can add images to existing proposals by editing them
+
+4. **No Database Changes**
+   - This version uses existing proposal JSON structure
+   - No table schema modifications
+   - No data migration required
+
+5. **Email Templates Improved**
+   - Emails are now more responsive on mobile devices
+   - Auction authorization emails show filtered data (less clutter)
+   - No action required - improvements are automatic
 
 ### Upgrading to 1.6.0
 
@@ -623,6 +768,16 @@ If upgrading from v1.0.x directly to v1.6.0:
 
 ## Credits
 
+### Version 1.8.0
+- Auction house dropdown system: Mubeen Hassan
+- Proposal image upload feature: Mubeen Hassan
+- Responsive email template conversion: Mubeen Hassan
+- Email data filtering: Mubeen Hassan
+
+### Version 1.7.1
+- Email formatting fixes: Mubeen Hassan
+- Security improvements: Mubeen Hassan
+
 ### Version 1.6.0
 - Settings page implementation: Mubeen Hassan
 - Documentation: Comprehensive README and CHANGELOG created
@@ -658,6 +813,6 @@ For support, bug reports, or feature requests:
 
 ---
 
-**Changelog Last Updated:** 2025-01-27
-**Current Version:** 1.7.0
-**Stable Version:** 1.7.0
+**Changelog Last Updated:** 2025-01-30
+**Current Version:** 1.8.0
+**Stable Version:** 1.8.0
