@@ -350,7 +350,7 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             <?php if (!empty($proposal['details'])): ?>
                             <div class="proposal-row" style="display: flex; margin-bottom: 16px; gap: 45px;">
                                 <div class="proposal-label" style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Details:</div>
-                                <div class="proposal-details-content" style="color: #4B5563; font-size: 14px; line-height: 1.6; flex: 1;">
+                                <div class="proposal-details-content" style="color: #4B5563; font-size: 16px; line-height: 1.6; flex: 1;">
                                     <?php echo wpautop($proposal['details']); ?>
                                 </div>
                             </div>

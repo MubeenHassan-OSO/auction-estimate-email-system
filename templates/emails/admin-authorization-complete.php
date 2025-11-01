@@ -93,7 +93,24 @@ $user_email = $form_data['user_email'] ?? 'Not available';
             .timeline-value {
                 font-size: 14px;
             }
+<<<<<<< Updated upstream
         }
+=======
+            .proposal-row{
+                flex-direction: column;
+                gap: 10px !important;
+            }
+
+            .proposal-row p {
+                margin: 0;
+            }
+
+            .table-header-title{
+                font-size: 22px !important;
+            }
+        }
+        
+>>>>>>> Stashed changes
     </style>
 </head>
 <body>

@@ -325,7 +325,7 @@ $edit_url = admin_url("admin.php?page=aees-edit-entry&edit={$entry_id}");
                             <?php if (!empty($proposal['details'])): ?>
                             <div class="proposal-field">
                                 <div class="proposal-field-label" style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Details</div>
-                                <div class="proposal-details-text" style="color: #4B5563; font-size: 14px; line-height: 1.6;">
+                                <div class="proposal-details-text" style="color: #4B5563; font-size: 16px; line-height: 1.6;">
                                     <?php
                                     // Data is already sanitized with wp_kses_post() when saved
                                     // Use wpautop() to convert line breaks to <p> and <br> tags
