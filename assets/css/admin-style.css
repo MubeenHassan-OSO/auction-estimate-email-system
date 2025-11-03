@@ -321,9 +321,11 @@ form.wp-list-table {
 
 /* Filter Form */
 .aees-filters-form {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
     gap: 16px;
+}
+.aees-filters-form label{
+    display: none;
 }
 
 .aees-filters-row {
@@ -337,7 +339,7 @@ form.wp-list-table {
     flex-direction: column;
     gap: 8px;
     flex: 1;
-    min-width: 200px;
+    min-width: 100px;
 }
 
 .aees-filter-group.aees-filter-search {
@@ -354,8 +356,8 @@ form.wp-list-table {
 
 .aees-filter-group select,
 .aees-filter-group input[type="text"] {
-    padding: 10px 14px;
-    border: 2px solid #E5E7EB;
+        padding: 8px 15px;
+    border: 1px solid black;
     border-radius: 8px;
     font-size: 14px;
     color: #1F2937;
@@ -386,7 +388,7 @@ form.wp-list-table {
     background-color: #000000;
     border-color: #000000;
     color: #FFFFFF;
-    padding: 10px 24px;
+    padding: 7px 24px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
@@ -403,13 +405,12 @@ form.wp-list-table {
 }
 
 .aees-filters-actions .button {
-    padding: 10px 24px;
+    padding: 7px 24px;
     border-radius: 8px;
     font-weight: 600;
     font-size: 14px;
-    background: #FFFFFF;
-    border: 2px solid #E5E7EB;
-    color: #374151;
+    background: #000000;
+    color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -420,6 +421,31 @@ form.wp-list-table {
     transform: translateY(-1px);
 }
 
+button.apply-filter-btn {
+    width: 50%;
+    text-align: center;
+    min-width: fit-content;
+    padding: 7px 15px !important;
+    border: 1px solid black !important;
+}
+button.apply-filter-btn:hover {
+   background: transparent !important;
+    color: black !important;
+    
+}
+a.clear-filter-btn {
+    width: 50%;
+    text-align: center;
+    min-width: fit-content;
+    padding: 7px 15px !important;
+    background: #db0f31 !important;
+    border: 1px solid #db0f31 !important;
+}
+a.clear-filter-btn:hover {
+    background: transparent !important;
+    color: #db0f31 !important;
+    
+}
 /* Table Wrapper to Ensure Spacing */
 .wp-list-table-wrapper {
     clear: both;

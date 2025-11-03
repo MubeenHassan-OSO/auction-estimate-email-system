@@ -51,7 +51,7 @@ class AEES_Submission_Table extends WP_List_Table
             <form method="get" class="aees-filters-form">
                 <input type="hidden" name="page" value="<?php echo esc_attr($_GET['page'] ?? ''); ?>">
 
-                <div class="aees-filters-row">
+                <div class="aees-filters-row aees-submission-dropdown-filter" style="width: 60%;">
                     <div class="aees-filter-group">
                         <label for="filter_entry_status">Entry Status</label>
                         <select name="filter_entry_status" id="filter_entry_status">
@@ -83,7 +83,7 @@ class AEES_Submission_Table extends WP_List_Table
                     </div>
                 </div>
 
-                <div class="aees-filters-row">
+                <div class="aees-filters-row aees-submission-email-filter" style="width: 20%;">
                     <div class="aees-filter-group aees-filter-search">
                         <label for="filter_email_search">Search by Email</label>
                         <input type="text"
@@ -94,10 +94,10 @@ class AEES_Submission_Table extends WP_List_Table
                     </div>
                 </div>
 
-                <div class="aees-filters-actions">
-                    <button type="submit" class="button button-primary">Apply Filters</button>
+                <div class="aees-filters-actions" style="width: 20%;">
+                    <button type="submit" class="button button-primary apply-filter-btn" >Apply</button>
                     <a href="<?php echo admin_url('admin.php?page=' . esc_attr($_GET['page'] ?? '')); ?>"
-                       class="button">Clear Filters</a>
+                       class="button clear-filter-btn">Clear</a>
                 </div>
             </form>
         </div>

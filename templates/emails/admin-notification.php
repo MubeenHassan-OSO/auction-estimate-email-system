@@ -359,10 +359,10 @@ $edit_url = admin_url("admin.php?page=aees-edit-entry&edit={$entry_id}");
 
                     <!-- Footer -->
                     <div class="footer" style="background: #F9FAFB; padding: 30px; text-align: center; border-top: 1px solid #E5E7EB;">
-                        <p class="footer-text" style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
+                        <p class="footer-text" style="margin: 0 0 10px 0; color: #6B7280; font-size: 16px;">
                             <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
                         </p>
-                        <p class="footer-copyright" style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                        <p class="footer-copyright" style="margin: 0; color: #9CA3AF; font-size: 14px;">
                             &copy; <?php echo date('Y'); ?>. All rights reserved.
                         </p>
                     </div>
