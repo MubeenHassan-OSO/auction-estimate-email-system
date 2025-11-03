@@ -75,20 +75,19 @@ if (!defined('ABSPATH')) exit;
                     <!-- Header with Logo -->
                     <?php if (!empty($logo_url)): ?>
                     <tr>
-                        <td style="padding: 30px 30px 0 30px; text-align: center;">
-                            <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($site_name); ?>" style="max-width: 180px; height: auto; display: block; margin: 0 auto;" />
+                        <td style=" background: #059669; padding: 30px 30px 0 30px; text-align: center;">
+                            <img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($site_name); ?>" style="max-width: 180px; height: 70px; display: block; margin: 0 auto;" />
                         </td>
                     </tr>
                     <?php endif; ?>
 
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center;">
-                            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+                        <td style="background: #059669; padding: 0 20px 30px 20px; text-align: center;">
                             <h1 style="margin: 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
                                 Great News!
                             </h1>
-                            <p style="margin: 12px 0 0 0; color: rgba(255, 255, 255, 0.95); font-size: 16px; font-weight: 400;">
+                            <p style="margin: 0; color: rgba(255, 255, 255, 0.95); font-size: 16px; font-weight: 400;">
                                 Your order has been confirmed
                             </p>
                         </td>

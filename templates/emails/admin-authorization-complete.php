@@ -93,38 +93,40 @@ $user_email = $form_data['user_email'] ?? 'Not available';
             .timeline-value {
                 font-size: 14px;
             }
-        }
+
             .proposal-row{
                 flex-direction: column;
                 gap: 10px !important;
             }
-
+            
+            .table-header-title{
+                font-size: 22px !important;
+            }
+        }
+            
             .proposal-row p {
                 margin: 0;
             }
 
-            .table-header-title{
-                font-size: 22px !important;
-            }
+            
         
     </style>
 </head>
 <body>
 
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F3F4F6; padding: 40px 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F3F4F6; padding: 40px 10px;">
         <tr>
             <td align="center">
                 <!-- Main Container -->
-                <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FFFFFF; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); max-width: 600px;">
 
                     <!-- Header -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center;">
-                            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-                            <h1 style="margin: 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                          <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px 25px; text-align: center;">
+                            <h1 class="table-header-title" style="margin: 0; color: #FFFFFF; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
                                 Order Fully Authorized!
                             </h1>
-                            <p style="margin: 12px 0 0 0; color: rgba(255, 255, 255, 0.95); font-size: 15px; font-weight: 400;">
+                              <p style="margin: 0; color: rgba(255, 255, 255, 0.95); font-size: 15px; font-weight: 400;">
                                 The auction house has confirmed authorization
                             </p>
                         </td>
@@ -132,15 +134,15 @@ $user_email = $form_data['user_email'] ?? 'Not available';
 
                     <!-- Body Content -->
                     <tr>
-                        <td style="padding: 40px 30px;">
+                        <td style="padding: 30px 25px;">
                             <!-- Success Alert -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #ECFDF5; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 30px;">
+                             <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #d1fae55c;border-radius: 8px;border: 1px solid #92ffc7; margin-bottom: 30px;">
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="color: #065F46; font-size: 14px; line-height: 1.6;">
-                                            <strong style="display: block; margin-bottom: 8px; font-size: 16px;">🎉 Workflow Complete!</strong>
+                                            <strong style="display: block; margin-bottom: 8px; font-size: 16px;">Workflow Complete!</strong>
                                             This order has been fully approved through all stages:
-                                            <ul style="margin: 12px 0 0 0; padding-left: 20px;">
+                                            <ul style="margin: 6px 0; padding-left: 20px;">
                                                 <li>Customer accepted the proposal</li>
                                                 <li>Auction house has now authorized it</li>
                                             </ul>
@@ -151,9 +153,9 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Authorization Info Card -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F9FAFB; border-radius: 8px; border-left: 4px solid #8B5CF6; margin-bottom: 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #d4d4d4; margin-bottom: 20px; padding: 20px;">
                                 <tr>
-                                    <td style="padding: 24px;">
+                                    <td>
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Authorization Details
                                         </h3>
@@ -172,9 +174,9 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Entry Info Card -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F9FAFB; border-radius: 8px; border-left: 4px solid #db0f31; margin-bottom: 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #d4d4d4; margin-bottom: 20px; padding: 20px;">
                                 <tr>
-                                    <td style="padding: 24px;">
+                                    <td>
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Order Details
                                         </h3>
@@ -197,23 +199,23 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Proposal Info Card -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #F9FAFB; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FFFFFF; border-radius: 8px; border: 1px solid #d4d4d4; margin-bottom: 20px; padding: 20px;">
                                 <tr>
-                                    <td style="padding: 24px;">
+                                    <td>
                                         <h3 style="margin: 0 0 16px 0; color: #1F2937; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
                                             Authorized Proposal
                                         </h3>
-                                        <div style="margin-bottom: 16px;">
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Title</div>
+                                        <div style="display: flex; margin-bottom: 16px; gap: 45px;" class="proposal-row">
+                                            <div style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Title</div>
                                             <div style="color: #1F2937; font-size: 16px; font-weight: 600;"><?php echo esc_html($proposal['title']); ?></div>
                                         </div>
-                                        <div style="margin-bottom: 16px;">
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Price</div>
-                                            <div style="color: #10B981; font-size: 24px; font-weight: 700;">$<?php echo esc_html(number_format((float)$proposal['price'], 2)); ?></div>
+                                        <div style="display: flex; margin-bottom: 16px; gap: 45px;" class="proposal-row">
+                                            <div style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Price</div>
+                                            <div style="color: #10B981; font-size: 16px; font-weight: 700;">$<?php echo esc_html(number_format((float)$proposal['price'], 2)); ?></div>
                                         </div>
                                         <?php if (!empty($proposal['details'])): ?>
-                                        <div>
-                                            <div style="color: #6B7280; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Details</div>
+                                        <div style="display: flex; margin-bottom: 16px; gap: 45px;" class="proposal-row">
+                                            <div style="color: #6B7280; font-size: 16px; font-weight: 400; letter-spacing: 0.5px; min-width: 70px;">Details</div>
                                             <div style="color: #4B5563; font-size: 16px; line-height: 1.6;">
                                                 <?php
                                                 // Data is already sanitized with wp_kses_post() when saved
@@ -239,11 +241,11 @@ $user_email = $form_data['user_email'] ?? 'Not available';
                             </table>
 
                             <!-- Timeline Summary -->
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FFFBEB; border-radius: 8px; margin-top: 30px; border-left: 4px solid #F59E0B;">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #FFFBEB;border-radius: 8px;margin-top: 30px;border: 1px solid #ffdf5e;">
                                 <tr>
                                     <td style="padding: 20px;">
                                         <div style="color: #92400E; font-size: 14px; line-height: 1.6;">
-                                            <strong style="display: block; margin-bottom: 12px; font-size: 16px;">📅 Complete Timeline:</strong>
+                                             <strong style="display: block; margin-bottom: 12px; font-size: 16px;">Complete Timeline:</strong>
                                             <div>
                                                 <div class="timeline-row">
                                                     <div class="timeline-label">1. Submitted:</div>
@@ -268,12 +270,12 @@ $user_email = $form_data['user_email'] ?? 'Not available';
 
                     <!-- Footer -->
                     <tr>
-                        <td style="background: #F9FAFB; padding: 30px; text-align: center; border-top: 1px solid #E5E7EB;">
-                            <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
-                                This is an automated notification from <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
+                        <td style="background: #F9FAFB; padding: 20px ; text-align: center; border-top: 1px solid #E5E7EB;">
+                            <p style="margin: 0; color: #6B7280; font-size: 16px;">
+                                <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
                             </p>
-                            <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                                &copy; <?php echo date('Y'); ?> <?php echo esc_html($site_name); ?>. All rights reserved.
+                             <p style="margin: 0; color: #9CA3AF; font-size: 14px;">
+                                &copy; <?php echo date('Y'); ?> All rights reserved.
                             </p>
                         </td>
                     </tr>
