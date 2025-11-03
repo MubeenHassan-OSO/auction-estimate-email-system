@@ -22,6 +22,7 @@ class AEES_Settings_Page
         add_action('admin_menu', [$this, 'register_settings_submenu'], 15);
         add_action('admin_init', [$this, 'register_settings']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_settings_scripts']);
+        add_filter('wp_redirect', [$this, 'redirect_to_active_tab'], 10, 2);
     }
 
     /**
@@ -37,6 +38,19 @@ class AEES_Settings_Page
             'aees-settings',                    // Menu slug
             [$this, 'render_settings_page']    // Callback
         );
+    }
+
+    /**
+     * Redirect to active tab after saving settings
+     */
+    public function redirect_to_active_tab($location, $status)
+    {
+        // Only modify redirect if we're saving settings
+        if (strpos($location, 'aees-settings') !== false && isset($_POST['aees_active_tab'])) {
+            $active_tab = sanitize_text_field($_POST['aees_active_tab']);
+            $location = add_query_arg('tab', $active_tab, $location);
+        }
+        return $location;
     }
 
     /**
@@ -85,6 +99,49 @@ class AEES_Settings_Page
             'aees_service_providers',
             [$this, 'sanitize_service_providers']
         );
+
+        // ============================================
+        // GENERAL SETTINGS TAB
+        // ============================================
+
+        // General Settings Section
+        add_settings_section(
+            'aees_general_section',
+            'Email Configuration',
+            [$this, 'render_general_section'],
+            'aees-settings-general'
+        );
+
+        // Admin Email Address
+        add_settings_field(
+            'admin_email',
+            'Admin Email Address',
+            [$this, 'render_admin_email_field'],
+            'aees-settings-general',
+            'aees_general_section'
+        );
+
+        // Send From Email
+        add_settings_field(
+            'send_from_email',
+            'Send From Email',
+            [$this, 'render_send_from_email_field'],
+            'aees-settings-general',
+            'aees_general_section'
+        );
+
+        // Send From Name
+        add_settings_field(
+            'send_from_name',
+            'Send From Name',
+            [$this, 'render_send_from_name_field'],
+            'aees-settings-general',
+            'aees_general_section'
+        );
+
+        // ============================================
+        // PROVIDERS TAB
+        // ============================================
 
         // General Settings Section - Hidden for now
         // add_settings_section(
@@ -135,7 +192,7 @@ class AEES_Settings_Page
             'aees_service_providers_section',
             'Service Providers',
             [$this, 'render_service_providers_section'],
-            'aees-settings'
+            'aees-settings-providers'
         );
 
         // Service Providers Field
@@ -143,7 +200,7 @@ class AEES_Settings_Page
             'service_providers',
             'Manage Service Providers',
             [$this, 'render_service_providers_field'],
-            'aees-settings',
+            'aees-settings-providers',
             'aees_service_providers_section'
         );
 
@@ -152,7 +209,7 @@ class AEES_Settings_Page
             'aees_auction_houses_section',
             'Auction Houses',
             [$this, 'render_auction_houses_section'],
-            'aees-settings'
+            'aees-settings-providers'
         );
 
         // Auction Houses Field
@@ -160,7 +217,7 @@ class AEES_Settings_Page
             'auction_houses',
             'Manage Auction Houses',
             [$this, 'render_auction_houses_field'],
-            'aees-settings',
+            'aees-settings-providers',
             'aees_auction_houses_section'
         );
     }
@@ -170,7 +227,65 @@ class AEES_Settings_Page
      */
     public function render_general_section()
     {
-        echo '<p>Configure the core settings for the Auction Estimate Email System.</p>';
+        echo '<p>Configure email addresses for receiving admin notifications and sending emails to users.</p>';
+    }
+
+    /**
+     * Render admin email field
+     */
+    public function render_admin_email_field()
+    {
+        $settings = get_option($this->option_name, []);
+        $default_admin_email = get_option('admin_email');
+        $value = isset($settings['admin_email']) && !empty($settings['admin_email'])
+            ? $settings['admin_email']
+            : $default_admin_email;
+
+        echo '<input type="email"
+                     name="' . $this->option_name . '[admin_email]"
+                     value="' . esc_attr($value) . '"
+                     class="regular-text"
+                     placeholder="' . esc_attr($default_admin_email) . '" />';
+        echo '<p class="description">Email address to receive admin notifications (proposal acceptance, rejections, authorization). Default: WordPress admin email.</p>';
+    }
+
+    /**
+     * Render send from email field
+     */
+    public function render_send_from_email_field()
+    {
+        $settings = get_option($this->option_name, []);
+        $default_email = 'noreply@' . wp_parse_url(home_url(), PHP_URL_HOST);
+        $value = isset($settings['send_from_email']) && !empty($settings['send_from_email'])
+            ? $settings['send_from_email']
+            : $default_email;
+
+        echo '<input type="email"
+                     name="' . $this->option_name . '[send_from_email]"
+                     value="' . esc_attr($value) . '"
+                     class="regular-text"
+                     placeholder="' . esc_attr($default_email) . '" />';
+        echo '<p class="description">Email address used as sender for all outgoing emails. Default: noreply@yourdomain.com</p>';
+        echo '<p class="description" style="color: #d63638;"><strong>Important:</strong> For better deliverability, use a real email address configured with your email provider.</p>';
+    }
+
+    /**
+     * Render send from name field
+     */
+    public function render_send_from_name_field()
+    {
+        $settings = get_option($this->option_name, []);
+        $default_name = get_bloginfo('name');
+        $value = isset($settings['send_from_name']) && !empty($settings['send_from_name'])
+            ? $settings['send_from_name']
+            : $default_name;
+
+        echo '<input type="text"
+                     name="' . $this->option_name . '[send_from_name]"
+                     value="' . esc_attr($value) . '"
+                     class="regular-text"
+                     placeholder="' . esc_attr($default_name) . '" />';
+        echo '<p class="description">Name displayed as sender in outgoing emails. Default: Your site name.</p>';
     }
 
     /**
@@ -428,26 +543,60 @@ class AEES_Settings_Page
 
     /**
      * Sanitize settings before saving
+     * IMPORTANT: Preserve existing settings not in current form
      */
     public function sanitize_settings($input)
     {
-        $sanitized = [];
+        // Check which tab was submitted
+        $active_tab = isset($_POST['aees_active_tab']) ? sanitize_text_field($_POST['aees_active_tab']) : 'general';
 
-        // Sanitize form ID
+        // Get existing settings to preserve values not in current form
+        $existing = get_option($this->option_name, []);
+
+        // If we're not on the general tab, preserve all existing settings
+        if ($active_tab !== 'general') {
+            return $existing;
+        }
+
+        // We're on general tab, start with existing values and update only submitted fields
+        $sanitized = $existing;
+
+        // Sanitize form ID (only if present in form)
         if (isset($input['forminator_form_id'])) {
             $sanitized['forminator_form_id'] = absint($input['forminator_form_id']);
         }
 
-        // Sanitize user response expiration
+        // Sanitize user response expiration (only if present in form)
         if (isset($input['user_response_expiration_days'])) {
             $days = absint($input['user_response_expiration_days']);
             $sanitized['user_response_expiration_days'] = max(1, min(90, $days)); // Between 1-90 days
         }
 
-        // Sanitize authorization expiration
+        // Sanitize authorization expiration (only if present in form)
         if (isset($input['authorization_expiration_days'])) {
             $days = absint($input['authorization_expiration_days']);
             $sanitized['authorization_expiration_days'] = max(1, min(90, $days)); // Between 1-90 days
+        }
+
+        // Sanitize admin email (only if present in form)
+        if (isset($input['admin_email'])) {
+            $email = sanitize_email($input['admin_email']);
+            if (is_email($email)) {
+                $sanitized['admin_email'] = $email;
+            }
+        }
+
+        // Sanitize send from email (only if present in form)
+        if (isset($input['send_from_email'])) {
+            $email = sanitize_email($input['send_from_email']);
+            if (is_email($email)) {
+                $sanitized['send_from_email'] = $email;
+            }
+        }
+
+        // Sanitize send from name (only if present in form)
+        if (isset($input['send_from_name'])) {
+            $sanitized['send_from_name'] = sanitize_text_field($input['send_from_name']);
         }
 
         return $sanitized;
@@ -455,14 +604,30 @@ class AEES_Settings_Page
 
     /**
      * Sanitize service providers before saving
+     * IMPORTANT: Preserve existing data if not on current tab
      */
     public function sanitize_service_providers($input)
     {
-        $sanitized = [];
+        // Check which tab was submitted
+        $active_tab = isset($_POST['aees_active_tab']) ? sanitize_text_field($_POST['aees_active_tab']) : '';
 
-        if (!is_array($input)) {
-            return $sanitized;
+        // If we're not on the providers tab, preserve existing data
+        if ($active_tab !== 'providers') {
+            $existing = get_option('aees_service_providers', []);
+            return $existing;
         }
+
+        // If input is not an array, return empty
+        if (!is_array($input)) {
+            return [];
+        }
+
+        // If input is empty array, user wants to clear all providers
+        if (empty($input)) {
+            return [];
+        }
+
+        $sanitized = [];
 
         foreach ($input as $provider) {
             // Skip if name is empty
@@ -493,14 +658,30 @@ class AEES_Settings_Page
 
     /**
      * Sanitize auction houses before saving
+     * IMPORTANT: Preserve existing data if not on current tab
      */
     public function sanitize_auction_houses($input)
     {
-        $sanitized = [];
+        // Check which tab was submitted
+        $active_tab = isset($_POST['aees_active_tab']) ? sanitize_text_field($_POST['aees_active_tab']) : '';
 
-        if (!is_array($input)) {
-            return $sanitized;
+        // If we're not on the providers tab, preserve existing data
+        if ($active_tab !== 'providers') {
+            $existing = get_option('aees_auction_houses', []);
+            return $existing;
         }
+
+        // If input is not an array, return empty
+        if (!is_array($input)) {
+            return [];
+        }
+
+        // If input is empty array, user wants to clear all houses
+        if (empty($input)) {
+            return [];
+        }
+
+        $sanitized = [];
 
         foreach ($input as $house) {
             // Skip if either name or email is empty
@@ -533,20 +714,77 @@ class AEES_Settings_Page
             wp_die(__('You do not have sufficient permissions to access this page.'));
         }
 
+        // Get active tab
+        $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'general';
+
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
 
             <?php settings_errors(); ?>
 
+            <!-- Tab Navigation -->
+            <nav class="nav-tab-wrapper wp-clearfix" style="margin-bottom: 20px;">
+                <a href="?page=aees-settings&tab=general"
+                   class="nav-tab <?php echo $active_tab === 'general' ? 'nav-tab-active' : ''; ?>">
+                    <span class="dashicons dashicons-admin-generic" style="margin-top: 3px;"></span> General Settings
+                </a>
+                <a href="?page=aees-settings&tab=providers"
+                   class="nav-tab <?php echo $active_tab === 'providers' ? 'nav-tab-active' : ''; ?>">
+                    <span class="dashicons dashicons-businessperson" style="margin-top: 3px;"></span> Service Providers & Auction Houses
+                </a>
+            </nav>
+
+            <!-- Tab Content -->
             <form class="service-providers-form" method="post" action="options.php">
                 <?php
                 settings_fields('aees_settings_group');
-                do_settings_sections('aees-settings');
+
+                // Add hidden field to indicate which tab is being saved
+                echo '<input type="hidden" name="aees_active_tab" value="' . esc_attr($active_tab) . '" />';
+
+                if ($active_tab === 'general') {
+                    // General Settings Tab
+                    do_settings_sections('aees-settings-general');
+                } elseif ($active_tab === 'providers') {
+                    // Service Providers & Auction Houses Tab
+                    do_settings_sections('aees-settings-providers');
+                }
+
                 submit_button('Save Settings');
                 ?>
             </form>
         </div>
+
+        <style>
+            /* Tab styling enhancements */
+            .nav-tab-wrapper {
+                border-bottom: 1px solid #ccc;
+                padding-left: 10px;
+            }
+            .nav-tab {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+            .nav-tab .dashicons {
+                font-size: 16px;
+            }
+            .nav-tab-active {
+                background-color: #fff;
+                border-bottom: 1px solid #fff;
+            }
+
+            /* Form styling */
+            .form-table th {
+                width: 220px;
+                font-weight: 600;
+            }
+            .form-table td input[type="text"],
+            .form-table td input[type="email"] {
+                width: 100%;
+                max-width: 500px;
+            }
+        </style>
         <?php
     }
 
@@ -636,5 +874,53 @@ class AEES_Settings_Page
         }
 
         return $auction_houses;
+    }
+
+    /**
+     * Get admin email address for notifications
+     * Falls back to WordPress admin email if not set
+     *
+     * @return string Admin email address
+     */
+    public static function get_admin_email()
+    {
+        $settings = get_option('aees_settings', []);
+        $admin_email = isset($settings['admin_email']) && !empty($settings['admin_email'])
+            ? $settings['admin_email']
+            : get_option('admin_email');
+
+        return $admin_email;
+    }
+
+    /**
+     * Get send from email address
+     * Falls back to noreply@domain.com if not set
+     *
+     * @return string Send from email address
+     */
+    public static function get_send_from_email()
+    {
+        $settings = get_option('aees_settings', []);
+        $send_from_email = isset($settings['send_from_email']) && !empty($settings['send_from_email'])
+            ? $settings['send_from_email']
+            : 'noreply@' . wp_parse_url(home_url(), PHP_URL_HOST);
+
+        return $send_from_email;
+    }
+
+    /**
+     * Get send from name
+     * Falls back to site name if not set
+     *
+     * @return string Send from name
+     */
+    public static function get_send_from_name()
+    {
+        $settings = get_option('aees_settings', []);
+        $send_from_name = isset($settings['send_from_name']) && !empty($settings['send_from_name'])
+            ? $settings['send_from_name']
+            : get_bloginfo('name');
+
+        return $send_from_name;
     }
 }

@@ -39,10 +39,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/user-proposals.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $subject = 'Please Check the Auction Shipping Estimates of your Request.';
@@ -62,7 +66,8 @@ class AEES_Proposal_Email_Manager
      */
     public function send_admin_notification($entry_id, $proposal, $action)
     {
-        $admin_email = get_option('admin_email');
+        // Get admin email from settings
+        $admin_email = AEES_Settings_Page::get_admin_email();
         $site_name = get_bloginfo('name');
 
         // Get user email from form data
@@ -75,10 +80,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/admin-notification.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $action_text = ucfirst($action);
@@ -112,10 +121,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/auction-authorization.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $subject = "[{$site_name}] Authorization Required - Proposal Accepted by Customer";
@@ -133,7 +146,8 @@ class AEES_Proposal_Email_Manager
      */
     public function send_admin_acceptance_notification($entry_id, $proposal, $form_data)
     {
-        $admin_email = get_option('admin_email');
+        // Get admin email from settings
+        $admin_email = AEES_Settings_Page::get_admin_email();
         $site_name = get_bloginfo('name');
 
         // Load HTML email template
@@ -141,10 +155,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/admin-acceptance-notification.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $subject = "[{$site_name}] Proposal Accepted - Awaiting Authorization (Entry #{$entry_id})";
@@ -163,7 +181,8 @@ class AEES_Proposal_Email_Manager
      */
     public function send_admin_authorization_complete($entry_id, $proposal, $form_data, $auction_email)
     {
-        $admin_email = get_option('admin_email');
+        // Get admin email from settings
+        $admin_email = AEES_Settings_Page::get_admin_email();
         $site_name = get_bloginfo('name');
 
         // Load HTML email template
@@ -171,10 +190,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/admin-authorization-complete.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $subject = "[{$site_name}] ✅ Order Authorized - Ready to Proceed (Entry #{$entry_id})";
@@ -219,10 +242,14 @@ class AEES_Proposal_Email_Manager
         include AEES_PLUGIN_DIR . 'templates/emails/user-authorization-confirmation.php';
         $email_body = ob_get_clean();
 
+        // Get send from email and name from settings
+        $from_email = AEES_Settings_Page::get_send_from_email();
+        $from_name = AEES_Settings_Page::get_send_from_name();
+
         // Email headers
         $headers = [
             'Content-Type: text/html; charset=UTF-8',
-            'From: ' . $site_name . ' <noreply@' . wp_parse_url(home_url(), PHP_URL_HOST) . '>',
+            'From: ' . $from_name . ' <' . $from_email . '>',
         ];
 
         $subject = 'Your Order Has Been Confirmed!';
