@@ -163,6 +163,12 @@ function aees_check_database_version()
         aees_migrate_existing_rejections_to_history();
         update_option('aees_db_version', '1.4');
     }
+
+    // Version 1.5 adds edit lock columns to proposals table
+    if (version_compare($db_version, '1.5', '<')) {
+        aees_upgrade_proposals_table_v15();
+        update_option('aees_db_version', '1.5');
+    }
 }
 
 /**
@@ -216,6 +222,36 @@ function aees_upgrade_proposals_table_v13()
     if (!in_array('entry_status', $columns)) {
         $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN entry_status VARCHAR(20) DEFAULT 'open' AFTER email_expires_at");
         $wpdb->query("ALTER TABLE {$table_name} ADD KEY idx_entry_status (entry_status)");
+    }
+}
+
+/**
+ * Upgrade proposals table - adds edit lock columns
+ * Version 1.5 upgrade
+ */
+function aees_upgrade_proposals_table_v15()
+{
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'aees_proposals';
+
+    // Check if table exists
+    if ($wpdb->get_var("SHOW TABLES LIKE '{$table_name}'") != $table_name) {
+        return; // Table doesn't exist yet
+    }
+
+    // Get existing columns
+    $columns = $wpdb->get_col("SHOW COLUMNS FROM {$table_name}", 0);
+
+    // Add edit_locked_by column if missing
+    if (!in_array('edit_locked_by', $columns)) {
+        $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN edit_locked_by BIGINT(20) UNSIGNED DEFAULT NULL AFTER entry_status");
+        $wpdb->query("ALTER TABLE {$table_name} ADD KEY idx_edit_locked_by (edit_locked_by)");
+    }
+
+    // Add edit_locked_time column if missing
+    if (!in_array('edit_locked_time', $columns)) {
+        $wpdb->query("ALTER TABLE {$table_name} ADD COLUMN edit_locked_time DATETIME DEFAULT NULL AFTER edit_locked_by");
+        $wpdb->query("ALTER TABLE {$table_name} ADD KEY idx_edit_locked_time (edit_locked_time)");
     }
 }
 

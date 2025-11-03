@@ -8,6 +8,155 @@ jQuery(document).ready(function ($) {
     const auctionEmailInput = $("#aees-auction-email");
     let unsavedChanges = false;
 
+    // ============================================
+    // EDIT LOCK FUNCTIONALITY
+    // ============================================
+
+    /**
+     * Check if entry is locked by another user on page load
+     * Show warning dialog if locked
+     */
+    if (aeesData.edit_lock && aeesData.edit_lock.user_name) {
+        showLockWarningDialog(aeesData.edit_lock);
+    }
+
+    /**
+     * Show WordPress-style lock warning dialog
+     */
+    function showLockWarningDialog(lockInfo) {
+        const userName = lockInfo.user_name || 'Another user';
+        const avatarUrl = lockInfo.avatar_url || '';
+
+        const dialogHtml = `
+            <div id="aees-lock-dialog-backdrop" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    max-width: 500px;
+                    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+                ">
+                    ${avatarUrl ? `<img src="${avatarUrl}" alt="${userName}" style="width: 64px; height: 64px; border-radius: 50%; margin-bottom: 15px;">` : ''}
+                    <h2 style="margin-top: 0; color: #d63638;">Entry Locked</h2>
+                    <p style="font-size: 14px; line-height: 1.6;">
+                        <strong>${userName}</strong> is currently editing this entry.
+                    </p>
+                    <p style="font-size: 13px; color: #646970; margin-bottom: 25px;">
+                        If you take over, their unsaved changes will be lost.
+                    </p>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button id="aees-lock-go-back" class="button" style="padding: 6px 15px;">
+                            Go Back
+                        </button>
+                        <button id="aees-lock-takeover" class="button button-primary" style="padding: 6px 15px; background: #d63638; border-color: #d63638;">
+                            Take Over
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        $('body').append(dialogHtml);
+
+        // Go Back button - return to listing page
+        $('#aees-lock-go-back').on('click', function() {
+            window.location.href = 'admin.php?page=aees';
+        });
+
+        // Take Over button - take control of the entry
+        $('#aees-lock-takeover').on('click', function() {
+            takeoverLock();
+        });
+    }
+
+    /**
+     * Take over the edit lock from another user
+     */
+    function takeoverLock() {
+        $.ajax({
+            url: aeesData.ajax_url,
+            method: 'POST',
+            data: {
+                action: 'aees_takeover_lock',
+                entry_id: aeesData.entry_id,
+                nonce: aeesData.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Remove dialog and allow editing
+                    $('#aees-lock-dialog-backdrop').remove();
+                    console.log('Lock taken over successfully');
+                } else {
+                    alert('Failed to take over lock: ' + (response.data?.message || 'Unknown error'));
+                }
+            },
+            error: function() {
+                alert('Failed to take over lock. Please try again.');
+            }
+        });
+    }
+
+    /**
+     * Release lock when user leaves the page
+     */
+    $(window).on('beforeunload', function() {
+        // Use sendBeacon for reliable delivery even when page is closing
+        const formData = new FormData();
+        formData.append('action', 'aees_release_lock');
+        formData.append('entry_id', aeesData.entry_id);
+        formData.append('nonce', aeesData.nonce);
+
+        // sendBeacon is non-blocking and works even during page unload
+        navigator.sendBeacon(aeesData.ajax_url, formData);
+    });
+
+    /**
+     * Heartbeat API integration - refresh lock every 15 seconds
+     * Also detect if someone else took over
+     */
+    if (typeof wp !== 'undefined' && wp.heartbeat) {
+        // Send lock refresh data with each heartbeat
+        $(document).on('heartbeat-send', function(event, data) {
+            data.aees_refresh_lock = true;
+            data.aees_entry_id = aeesData.entry_id;
+        });
+
+        // Handle heartbeat response
+        $(document).on('heartbeat-tick', function(event, data) {
+            if (data.aees_lock_error) {
+                // Someone else took over the lock
+                const lockInfo = data.aees_lock_info || {};
+                const userName = lockInfo.user_name || 'Another user';
+
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Lock Taken Over',
+                    html: `<strong>${userName}</strong> has taken over editing this entry.<br><br>Your changes cannot be saved. The page will reload.`,
+                    confirmButtonText: 'Reload Page',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false
+                }).then(function() {
+                    window.location.reload();
+                });
+            }
+        });
+    }
+
+    // ============================================
+    // END EDIT LOCK FUNCTIONALITY
+    // ============================================
+
     // Handle auction house dropdown selection
     auctionHouseSelect.on("change", function () {
         const selectedOption = $(this).find("option:selected");

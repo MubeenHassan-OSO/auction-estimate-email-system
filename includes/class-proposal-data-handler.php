@@ -676,4 +676,201 @@ class AEES_Proposal_Data_Handler
 
         return $result !== false;
     }
+
+    /**
+     * Set edit lock for an entry
+     * Called when a user opens the edit page
+     *
+     * @param int $entry_id The entry ID
+     * @param int $user_id The user ID taking the lock
+     * @return bool Success status
+     */
+    public function set_edit_lock($entry_id, $user_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aees_proposals';
+
+        // Check if entry exists
+        $exists = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM {$table_name} WHERE entry_id = %d",
+                $entry_id
+            )
+        );
+
+        if ($exists) {
+            // Update existing
+            $result = $wpdb->update(
+                $table_name,
+                [
+                    'edit_locked_by' => $user_id,
+                    'edit_locked_time' => current_time('mysql')
+                ],
+                ['entry_id' => $entry_id],
+                ['%d', '%s'],
+                ['%d']
+            );
+        } else {
+            // Insert new record with lock
+            $result = $wpdb->insert(
+                $table_name,
+                [
+                    'entry_id' => $entry_id,
+                    'edit_locked_by' => $user_id,
+                    'edit_locked_time' => current_time('mysql'),
+                    'entry_status' => 'open',
+                    'auction_house_email' => '',
+                    'proposals' => json_encode([]),
+                    'date_created' => current_time('mysql'),
+                    'date_updated' => current_time('mysql')
+                ],
+                ['%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s']
+            );
+        }
+
+        return $result !== false;
+    }
+
+    /**
+     * Check if entry is locked by another user
+     * Returns lock info if locked by someone else within last 150 seconds
+     *
+     * @param int $entry_id The entry ID
+     * @param int $current_user_id The current user ID
+     * @return array|false Lock info array or false if not locked
+     */
+    public function check_edit_lock($entry_id, $current_user_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aees_proposals';
+
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT edit_locked_by, edit_locked_time FROM {$table_name} WHERE entry_id = %d",
+                $entry_id
+            ),
+            ARRAY_A
+        );
+
+        // No lock set
+        if (!$row || empty($row['edit_locked_by']) || empty($row['edit_locked_time'])) {
+            return false;
+        }
+
+        $locked_by = intval($row['edit_locked_by']);
+        $locked_time = strtotime($row['edit_locked_time']);
+        $current_time = strtotime(current_time('mysql'));
+
+        // Lock expired (older than 150 seconds)
+        if (($current_time - $locked_time) > 150) {
+            return false;
+        }
+
+        // Locked by current user (not a conflict)
+        if ($locked_by === $current_user_id) {
+            return false;
+        }
+
+        // Locked by another user
+        $user = get_userdata($locked_by);
+
+        return [
+            'user_id' => $locked_by,
+            'user_name' => $user ? $user->display_name : 'Another user',
+            'locked_time' => $row['edit_locked_time'],
+            'avatar_url' => $user ? get_avatar_url($locked_by) : ''
+        ];
+    }
+
+    /**
+     * Release edit lock for an entry
+     * Called when user leaves the page or explicitly releases
+     *
+     * @param int $entry_id The entry ID
+     * @param int $user_id The user ID releasing the lock (for verification)
+     * @return bool Success status
+     */
+    public function release_edit_lock($entry_id, $user_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aees_proposals';
+
+        // Only release if locked by this user
+        $result = $wpdb->update(
+            $table_name,
+            [
+                'edit_locked_by' => null,
+                'edit_locked_time' => null
+            ],
+            [
+                'entry_id' => $entry_id,
+                'edit_locked_by' => $user_id
+            ],
+            ['%d', '%s'],
+            ['%d', '%d']
+        );
+
+        return $result !== false;
+    }
+
+    /**
+     * Refresh edit lock (called by heartbeat)
+     * Extends the lock time to keep it active
+     *
+     * @param int $entry_id The entry ID
+     * @param int $user_id The user ID refreshing the lock
+     * @return bool Success status
+     */
+    public function refresh_edit_lock($entry_id, $user_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aees_proposals';
+
+        // Only refresh if locked by this user
+        $result = $wpdb->update(
+            $table_name,
+            ['edit_locked_time' => current_time('mysql')],
+            [
+                'entry_id' => $entry_id,
+                'edit_locked_by' => $user_id
+            ],
+            ['%s'],
+            ['%d', '%d']
+        );
+
+        return $result !== false;
+    }
+
+    /**
+     * Get detailed lock information
+     *
+     * @param int $entry_id The entry ID
+     * @return array|null Lock info or null if not locked
+     */
+    public function get_lock_info($entry_id)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'aees_proposals';
+
+        $row = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT edit_locked_by, edit_locked_time FROM {$table_name} WHERE entry_id = %d",
+                $entry_id
+            ),
+            ARRAY_A
+        );
+
+        if (!$row || empty($row['edit_locked_by'])) {
+            return null;
+        }
+
+        $user = get_userdata($row['edit_locked_by']);
+
+        return [
+            'user_id' => $row['edit_locked_by'],
+            'user_name' => $user ? $user->display_name : 'Unknown',
+            'locked_time' => $row['edit_locked_time'],
+            'avatar_url' => $user ? get_avatar_url($row['edit_locked_by']) : ''
+        ];
+    }
 }

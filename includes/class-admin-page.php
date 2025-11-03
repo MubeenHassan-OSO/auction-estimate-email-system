@@ -38,6 +38,10 @@ class AEES_Admin_Page
 
     public function render_page()
     {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
+
         echo '<div class="wrap">';
         echo '<h1>Auction Estimate Email System</h1>';
 

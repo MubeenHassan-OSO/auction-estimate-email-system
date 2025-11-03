@@ -366,7 +366,6 @@ $edit_url = admin_url("admin.php?page=aees-edit-entry&edit={$entry_id}");
                             &copy; <?php echo date('Y'); ?>. All rights reserved.
                         </p>
                     </div>
-
                 </div>
             </td>
         </tr>

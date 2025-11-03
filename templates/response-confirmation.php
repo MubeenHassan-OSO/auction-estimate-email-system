@@ -408,7 +408,7 @@ delete_transient('aees_response_status');
         // Determine button text and link based on action
         if ($success && $action === 'rejected') {
             $button_text = 'Submit New Request';
-            $button_url = home_url('/auction-estimate/');
+            $button_url = home_url('/auction-house-form/');
         } else {
             $button_text = 'Return to Home';
             $button_url = home_url('/');

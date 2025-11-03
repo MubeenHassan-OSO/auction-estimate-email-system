@@ -30,6 +30,13 @@ class AEES_Edit_Entry_Page
         add_action('wp_ajax_aees_refresh_cache', [$this, 'ajax_refresh_cache']);
         add_action('wp_ajax_aees_toggle_entry_status', [$this, 'ajax_toggle_entry_status']);
 
+        // Edit lock AJAX handlers
+        add_action('wp_ajax_aees_takeover_lock', [$this, 'ajax_takeover_lock']);
+        add_action('wp_ajax_aees_release_lock', [$this, 'ajax_release_lock']);
+
+        // Heartbeat API for lock maintenance
+        add_filter('heartbeat_received', [$this, 'heartbeat_refresh_lock'], 10, 2);
+
         // Public-facing response handlers - delegate to response handler
         add_action('template_redirect', [$this->response_handler, 'handle_proposal_response']);
         add_action('template_redirect', [$this->response_handler, 'handle_authorization_response']);
@@ -117,6 +124,10 @@ class AEES_Edit_Entry_Page
         // Get service providers for dropdown
         $service_providers = AEES_Settings_Page::get_service_providers();
 
+        // Check edit lock for current entry
+        $current_user_id = get_current_user_id();
+        $edit_lock = $current_entry_id ? $this->data_handler->check_edit_lock($current_entry_id, $current_user_id) : false;
+
         wp_localize_script('aees-admin-edit-js', 'aeesData', [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce'    => $nonce,
@@ -124,18 +135,32 @@ class AEES_Edit_Entry_Page
             'email_status' => $email_status, // Pass email status to JavaScript
             'entry_status' => $entry_status,  // Pass entry status to JavaScript
             'has_authorized_proposals' => $has_authorized, // Pass authorization flag
-            'service_providers' => $service_providers // Pass service providers for dropdown
+            'service_providers' => $service_providers, // Pass service providers for dropdown
+            'edit_lock' => $edit_lock // Pass edit lock info to JavaScript
         ]);
     }
 
     public function render_page()
     {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
+
         if (!isset($_GET['edit'])) {
             echo '<div class="wrap"><h2>Invalid Entry</h2></div>';
             return;
         }
 
         $this->entry_id = intval($_GET['edit']);
+
+        // Check if entry is locked by another user
+        $current_user_id = get_current_user_id();
+        $lock_info = $this->data_handler->check_edit_lock($this->entry_id, $current_user_id);
+
+        // If not locked or lock expired, set lock for current user
+        if (!$lock_info) {
+            $this->data_handler->set_edit_lock($this->entry_id, $current_user_id);
+        }
 
         // Get data from custom table - delegated to data handler
         $proposal_data = $this->data_handler->get_proposal_data($this->entry_id);
@@ -157,6 +182,10 @@ class AEES_Edit_Entry_Page
 
         // Check if entry has authorized proposals (permanent closure)
         $has_authorized_proposals = $this->data_handler->has_authorized_proposals($this->entry_id);
+
+        // Pass lock info to template for JavaScript
+        // If locked by another user, JS will show takeover dialog
+        $edit_lock = $lock_info;
 
         $template_path = AEES_PLUGIN_DIR . 'templates/edit-entry-template.php';
         if (file_exists($template_path)) {
@@ -386,6 +415,101 @@ class AEES_Edit_Entry_Page
         } else {
             wp_send_json_error(['message' => 'Failed to update entry status']);
         }
+    }
+
+    /**
+     * AJAX handler to take over edit lock
+     * Called when user clicks "Take Over" in lock warning dialog
+     */
+    public function ajax_takeover_lock()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+        check_ajax_referer('aees_save_entry_nonce', 'nonce');
+
+        $entry_id = isset($_POST['entry_id']) ? intval($_POST['entry_id']) : 0;
+        if (!$entry_id) {
+            wp_send_json_error(['message' => 'Invalid entry ID'], 400);
+        }
+
+        $current_user_id = get_current_user_id();
+
+        // Force set lock to current user (takeover)
+        $result = $this->data_handler->set_edit_lock($entry_id, $current_user_id);
+
+        if ($result) {
+            wp_send_json_success(['message' => 'Lock taken over successfully']);
+        } else {
+            wp_send_json_error(['message' => 'Failed to take over lock']);
+        }
+    }
+
+    /**
+     * AJAX handler to release edit lock
+     * Called when user leaves the page (beforeunload)
+     */
+    public function ajax_release_lock()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized'], 403);
+        }
+        check_ajax_referer('aees_save_entry_nonce', 'nonce');
+
+        $entry_id = isset($_POST['entry_id']) ? intval($_POST['entry_id']) : 0;
+        if (!$entry_id) {
+            wp_send_json_error(['message' => 'Invalid entry ID'], 400);
+        }
+
+        $current_user_id = get_current_user_id();
+
+        // Release lock
+        $result = $this->data_handler->release_edit_lock($entry_id, $current_user_id);
+
+        if ($result !== false) {
+            wp_send_json_success(['message' => 'Lock released successfully']);
+        } else {
+            wp_send_json_error(['message' => 'Failed to release lock']);
+        }
+    }
+
+    /**
+     * Heartbeat API handler to refresh edit lock
+     * Runs every 15 seconds while user is on the edit page
+     *
+     * @param array $response Heartbeat response data
+     * @param array $data Heartbeat data from client
+     * @return array Modified response
+     */
+    public function heartbeat_refresh_lock($response, $data)
+    {
+        // Check if this heartbeat is for our edit page
+        if (!isset($data['aees_refresh_lock']) || !isset($data['aees_entry_id'])) {
+            return $response;
+        }
+
+        $entry_id = intval($data['aees_entry_id']);
+        $current_user_id = get_current_user_id();
+
+        if (!$entry_id || !current_user_can('manage_options')) {
+            return $response;
+        }
+
+        // Refresh the lock
+        $result = $this->data_handler->refresh_edit_lock($entry_id, $current_user_id);
+
+        // Check if someone else took over
+        $lock_info = $this->data_handler->check_edit_lock($entry_id, $current_user_id);
+
+        if ($lock_info) {
+            // Someone else has taken over
+            $response['aees_lock_error'] = true;
+            $response['aees_lock_info'] = $lock_info;
+        } else {
+            $response['aees_lock_refreshed'] = true;
+        }
+
+        return $response;
     }
 
     /**

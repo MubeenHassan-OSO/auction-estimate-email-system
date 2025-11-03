@@ -198,10 +198,10 @@ if (!defined('ABSPATH')) exit;
                     <tr>
                         <td style="background: #F9FAFB; padding: 30px; text-align: center; border-top: 1px solid #E5E7EB;">
                             <p style="margin: 0 0 10px 0; color: #6B7280; font-size: 13px;">
-                                This is an automated confirmation from <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
+                                <strong style="color: #1F2937;"><?php echo esc_html($site_name); ?></strong>
                             </p>
                             <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                                &copy; <?php echo date('Y'); ?> <?php echo esc_html($site_name); ?>. All rights reserved.
+                                &copy; <?php echo date('Y'); ?>. All rights reserved.
                             </p>
                         </td>
                     </tr>
